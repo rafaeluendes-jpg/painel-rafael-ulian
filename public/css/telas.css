@@ -415,8 +415,14 @@
 .acao-detalhe .nota {
   grid-column: 1 / -1;
 }
-.acao-detalhe .nota input {
-  margin-top: 4px;
+.acao-detalhe .nota-form {
+  display: flex;
+  gap: 8px;
+  margin: 4px 0 0;
+}
+.acao-detalhe .nota-form input {
+  flex: 1;
+  min-width: 0;
 }
 .plano-rodape {
   display: flex;

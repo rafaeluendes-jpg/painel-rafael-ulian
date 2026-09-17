@@ -90,11 +90,23 @@ function detalhe(acao, pasta) {
     disabled: !podeEditar(pasta),
     'aria-label': `Observação de ${acao.titulo}`,
   })
-  nota.addEventListener('change', async () => {
+  // Salvar grava a observação e recolhe o detalhe (o Enter faz o mesmo).
+  const salvarBotao = el(
+    'button',
+    { type: 'submit', class: 'botao ouro pequeno', disabled: !podeEditar(pasta) },
+    'Salvar',
+  )
+  const formulario = el('form', { class: 'nota-form', novalidate: true }, nota, salvarBotao)
+  formulario.addEventListener('submit', async (evento) => {
+    evento.preventDefault()
+    salvarBotao.disabled = true
     try {
       await anotarAcao(acao, nota.value.trim())
+      detalhesAbertos.delete(acao.id)
+      montarPlano()
       avisar('Observação salva.')
     } catch (e) {
+      salvarBotao.disabled = false
       avisar(mensagemDeErro(e, 'Não consegui salvar a observação.'), true)
     }
   })
@@ -102,7 +114,7 @@ function detalhe(acao, pasta) {
     'div',
     { class: 'acao-detalhe' },
     campos.map(([rot, txt]) => el('div', {}, el('div', { class: 'rot' }, rot), txt)),
-    el('div', { class: 'nota' }, el('div', { class: 'rot' }, 'Observação'), nota),
+    el('div', { class: 'nota' }, el('div', { class: 'rot' }, 'Observação'), formulario),
   )
 }
 
