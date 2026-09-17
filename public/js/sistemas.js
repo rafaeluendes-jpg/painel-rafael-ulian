@@ -36,7 +36,7 @@ export const SISTEMAS = {
   outros: [
     {
       nome: 'R2ON',
-      url: 'https://r2on.netlify.app',
+      url: 'https://r2on.com',
       icone: G(['#9C958A', '#1B1A17'], 'R2'),
     },
   ],
