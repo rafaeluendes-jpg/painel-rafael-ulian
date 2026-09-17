@@ -150,7 +150,7 @@ function azulejo(sistema) {
   // Selo no canto: diferencia variações do mesmo sistema (ex.: o app de faturamento).
   if (sistema.selo) ic.append(el('span', { class: 'selo-canto num' }, sistema.selo))
   const destino = enderecoParaAbrir(sistema)
-  const abreApp = destino.startsWith('intent:')
+  const abreApp = /^(intent|market):/.test(destino)
   return el(
     'a',
     {

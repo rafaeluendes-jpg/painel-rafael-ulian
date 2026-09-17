@@ -44,12 +44,12 @@ export const SISTEMAS = {
       icone: G(['#FF7A59', '#7A2210'], 'S'),
     },
     {
-      // Aplicativo do celular (faturamento em tempo real). No Android abre o app
-      // instalado; sem ele, cai na loja. No computador vai para a página da loja.
+      // Aplicativo do celular (faturamento em tempo real).
       nome: 'Saipos Gestão',
       url: 'https://play.google.com/store/apps/details?id=com.saipos.mobilemanager',
-      android:
-        'intent://#Intent;package=com.saipos.mobilemanager;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;S.browser_fallback_url=https%3A%2F%2Fplay.google.com%2Fstore%2Fapps%2Fdetails%3Fid%3Dcom.saipos.mobilemanager;end',
+      // O Chrome so abre apps que publicam um "link de abertura"; o Saipos Gestao nao
+      // publica. Entao vai para a ficha do app na Play Store (botao Abrir), sem passar pelo site.
+      android: 'market://details?id=com.saipos.mobilemanager',
       endereco: 'app · faturamento ao vivo',
       site: 'saipos.com.br',
       selo: 'R$',
