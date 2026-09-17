@@ -40,7 +40,7 @@ export const SISTEMAS = {
     {
       nome: 'Saipos',
       url: 'https://conta.saipos.com/#/access/login',
-      site: 'conta.saipos.com',
+      site: 'saipos.com.br',
       icone: G(['#FF7A59', '#7A2210'], 'S'),
     },
   ],
