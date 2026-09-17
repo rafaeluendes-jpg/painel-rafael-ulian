@@ -4,82 +4,123 @@
 .entrada {
   min-height: 100%;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1.1fr 1fr;
+  background:
+    radial-gradient(70% 60% at 30% 40%, rgba(217, 180, 90, 0.14), transparent 60%), #050506;
 }
 .entrada-marca {
-  background: #050506;
   color: #efebe2;
-  padding: 48px;
+  padding: 8%;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 18px;
+  gap: 22px;
   border-right: 1px solid rgba(255, 255, 255, 0.085);
 }
-.logo-grande {
-  width: 112px;
-  height: 112px;
-  border-radius: 28px;
-  background: #0a0a0c;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  padding: 12px;
+.entrada-icone {
+  width: 128px;
+  height: 128px;
+  border-radius: 31px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(160deg, #1a1a1f 0%, #0a0a0c 70%);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.14) inset,
+    0 0 0 1px rgba(255, 255, 255, 0.08),
+    0 30px 50px -25px rgba(0, 0, 0, 1);
+}
+.entrada-icone img {
+  width: 100px;
+  height: 100px;
+  display: block;
 }
 .entrada-marca h1 {
-  font-size: 34px;
+  font-size: 32px;
   letter-spacing: -0.02em;
 }
 .entrada-frase {
   color: #9c958a;
-  font-size: 16px;
-  max-width: 34ch;
+  font-size: 15px;
+  max-width: 32ch;
 }
 .entrada-numeros {
   display: flex;
-  gap: 1px;
+  gap: 30px;
   margin: 10px 0 0;
-  background: rgba(255, 255, 255, 0.085);
-  border: 1px solid rgba(255, 255, 255, 0.085);
-  border-radius: 10px;
-  overflow: hidden;
-  width: fit-content;
 }
 .entrada-numeros div {
-  background: #0f0f12;
-  padding: 10px 22px;
-  min-width: 110px;
+  border-left: 1px solid rgba(255, 255, 255, 0.16);
+  padding-left: 14px;
 }
 .entrada-numeros dt {
-  font-size: 10.5px;
-  letter-spacing: 0.14em;
+  font-size: 10px;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   color: #6b665d;
   font-weight: 600;
 }
 .entrada-numeros dd {
-  margin: 0;
-  font-size: 24px;
-  font-weight: 600;
+  margin: 2px 0 0;
+  font-size: 22px;
+  font-weight: 500;
   color: #f0dca0;
 }
 .entrada-form {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: grid;
+  place-items: center;
   padding: 32px 16px;
-  background: var(--painel);
 }
-.entrada-form-miolo {
-  width: min(380px, 100%);
+.entrada-cartao {
+  width: min(360px, 100%);
+  border-radius: 18px;
+  padding: 30px;
+  background: rgba(23, 23, 27, 0.72);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.08) inset,
+    0 40px 60px -30px rgba(0, 0, 0, 0.9);
+  color: #efebe2;
+}
+.entrada-cartao .sec {
+  color: #9c958a;
+}
+.entrada-cartao label {
+  color: #9c958a;
+}
+.entrada-cartao input[type='email'],
+.entrada-cartao input[type='password'] {
+  background: rgba(0, 0, 0, 0.35);
+  border-color: rgba(255, 255, 255, 0.12);
+  color: #efebe2;
+}
+.entrada-cartao input:focus-visible {
+  outline: none;
+  border-color: #d9b45a;
+  box-shadow: 0 0 0 3px rgba(217, 180, 90, 0.18);
+}
+.entrada-cartao .botao.ouro {
+  background: linear-gradient(180deg, #e6c46a, #c9a227);
+  border-color: transparent;
+  color: #0a0a0c;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.35) inset;
+}
+.entrada-cartao .marcar {
+  color: #efebe2;
 }
 .entrada-plaquinha {
-  margin-bottom: 18px;
+  width: 40px;
+  height: 40px;
+  border-radius: 11px;
+  margin-bottom: 8px;
 }
 .entrada-form h2 {
-  font-size: 22px;
+  font-size: 19px;
 }
 .entrada-form .sec {
   margin-top: 4px;
-  font-size: 13px;
+  font-size: 12.5px;
 }
 .entrada-linha {
   display: flex;
@@ -87,11 +128,12 @@
   align-items: center;
   gap: 10px;
   margin: 14px 0 18px;
-  font-size: 13px;
+  font-size: 12px;
 }
 .entrada-nota {
-  font-size: 12px;
-  margin-top: 16px;
+  font-size: 11.5px;
+  margin-top: 14px;
+  text-align: center;
 }
 
 /* ---------------------------------------------------------------- hoje */
@@ -753,6 +795,12 @@
   }
   .entrada-marca {
     display: none;
+  }
+  .entrada-form {
+    padding: 24px 16px;
+  }
+  .entrada-cartao {
+    padding: 24px 20px;
   }
   .corpo {
     grid-template-columns: 1fr;
