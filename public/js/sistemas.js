@@ -43,6 +43,18 @@ export const SISTEMAS = {
       site: 'saipos.com.br',
       icone: G(['#FF7A59', '#7A2210'], 'S'),
     },
+    {
+      // Aplicativo do celular (faturamento em tempo real). No Android abre o app
+      // instalado; sem ele, cai na loja. No computador vai para a página da loja.
+      nome: 'Saipos Gestão',
+      url: 'https://play.google.com/store/apps/details?id=com.saipos.mobilemanager',
+      android:
+        'intent://#Intent;package=com.saipos.mobilemanager;S.browser_fallback_url=https%3A%2F%2Fplay.google.com%2Fstore%2Fapps%2Fdetails%3Fid%3Dcom.saipos.mobilemanager;end',
+      endereco: 'app · faturamento ao vivo',
+      site: 'saipos.com.br',
+      selo: 'R$',
+      icone: G(['#FF7A59', '#7A2210'], 'SG'),
+    },
   ],
   outros: [
     {
@@ -78,6 +90,12 @@ export function totalDeSistemas() {
 /** Endereço curto para mostrar embaixo do azulejo. */
 export function enderecoCurto(url) {
   return url.replace(/^https?:\/\//, '').replace(/\/$/, '')
+}
+
+/** Endereço que abre neste aparelho: no Android, o app instalado quando houver. */
+export function enderecoParaAbrir(sistema) {
+  const android = /Android/i.test(navigator.userAgent)
+  return android && sistema.android ? sistema.android : sistema.url
 }
 
 /** Endereço do ícone pelo serviço de favicon (para sites de terceiros). */

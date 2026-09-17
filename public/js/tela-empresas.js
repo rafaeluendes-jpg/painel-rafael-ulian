@@ -1,7 +1,13 @@
 // Empresas: primeiro as pastas; dentro, a grade de sistemas tipo Launchpad.
 import { el, limpar, icone } from './dom.js'
 import { estado, pastaPorId } from './estado.js'
-import { sistemasDaPasta, enderecoCurto, desenhoDoAzulejo, iconeDoSite } from './sistemas.js'
+import {
+  sistemasDaPasta,
+  enderecoCurto,
+  enderecoParaAbrir,
+  desenhoDoAzulejo,
+  iconeDoSite,
+} from './sistemas.js'
 
 const VOLTAR = 'M10 3L5 8l5 5'
 const VOLTAR_INVERTIDO = 'M6 3l5 5-5 5'
@@ -141,11 +147,25 @@ function azulejo(sistema) {
     ic.classList.add('com-imagem')
     ic.append(img)
   } else ic.append(desenhoDoAzulejo(sistema.icone))
+  // Selo no canto: diferencia variações do mesmo sistema (ex.: o app de faturamento).
+  if (sistema.selo) ic.append(el('span', { class: 'selo-canto num' }, sistema.selo))
+  const destino = enderecoParaAbrir(sistema)
+  const abreApp = destino.startsWith('intent:')
   return el(
     'a',
-    { class: 'azulejo', href: sistema.url, target: '_blank', rel: 'noopener noreferrer' },
+    {
+      class: 'azulejo',
+      href: destino,
+      target: abreApp ? '_self' : '_blank',
+      rel: 'noopener noreferrer',
+    },
     ic,
-    el('div', {}, el('b', {}, sistema.nome), el('span', {}, enderecoCurto(sistema.url))),
+    el(
+      'div',
+      {},
+      el('b', {}, sistema.nome),
+      el('span', {}, sistema.endereco || enderecoCurto(sistema.url)),
+    ),
   )
 }
 

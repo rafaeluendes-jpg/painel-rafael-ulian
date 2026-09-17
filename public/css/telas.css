@@ -868,6 +868,22 @@
   object-fit: cover;
   display: block;
 }
+.azulejo-icone .selo-canto {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  min-width: 26px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 7px;
+  background: var(--ouro);
+  color: #0a0a0c;
+  font-size: 11px;
+  font-weight: 600;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+}
 .azulejo-icone img.favicon {
   width: 54%;
   height: 54%;
