@@ -1,6 +1,6 @@
 // Service worker: guarda a casca do painel para abrir rápido e instalado no celular.
 // Dados nunca são guardados aqui (vão sempre ao Supabase).
-const VERSAO = 'ru-2026-09-17-2'
+const VERSAO = 'ru-2026-09-17-3'
 const CASCA = [
   '/',
   '/index.html',
@@ -72,13 +72,16 @@ self.addEventListener('fetch', (evento) => {
         }
       }
       const guardado = await cache.match(request)
-      const daRede = fetch(request)
-        .then((resposta) => {
-          if (resposta.ok) cache.put(request, resposta.clone())
-          return resposta
-        })
-        .catch(() => guardado)
-      return guardado || daRede
+      // Arquivos do painel: rede primeiro, para a versão nova aparecer na hora;
+      // sem internet, vale o que está guardado. Fontes: o guardado basta.
+      if (fonte && guardado) return guardado
+      try {
+        const resposta = await fetch(request)
+        if (resposta.ok) cache.put(request, resposta.clone())
+        return resposta
+      } catch {
+        return guardado || Response.error()
+      }
     })(),
   )
 })
