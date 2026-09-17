@@ -1,0 +1,15 @@
+{
+  "name": "painel-rafael-ulian",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Painel pessoal do Rafael Ulian: checklist do dia e atalhos para todos os sistemas.",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "test:navegador": "node test/navegador.mjs"
+  },
+  "devDependencies": {
+    "wrangler": "^4.40.0"
+  }
+}

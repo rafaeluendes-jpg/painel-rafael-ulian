@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="pt-BR" data-tema="escuro">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#050506" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#EDE7DA" media="(prefers-color-scheme: light)" />
+    <meta
+      name="description"
+      content="Painel pessoal do Rafael Ulian: o checklist do dia e os atalhos para todos os sistemas."
+    />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Painel RU" />
+    <title>Painel Rafael Ulian</title>
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="icon" href="/icones/icone-192.png" type="image/png" />
+    <link rel="apple-touch-icon" href="/icones/icone-192.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+    />
+    <link rel="stylesheet" href="/css/base.css" />
+    <link rel="stylesheet" href="/css/telas.css" />
+  </head>
+  <body>
+    <!-- Tela de entrada: nada do painel é montado sem sessão válida. -->
+    <section id="entrada" class="entrada" hidden>
+      <div class="entrada-marca">
+        <img class="logo-grande" src="/logo/ru.svg" alt="Monograma RU" width="112" height="112" />
+        <h1>Rafael Ulian</h1>
+        <p class="entrada-frase">Uma porta só para o seu dia: o checklist e todos os sistemas.</p>
+        <dl class="entrada-numeros">
+          <div>
+            <dt>Pastas</dt>
+            <dd class="num">4</dd>
+          </div>
+          <div>
+            <dt>Sistemas</dt>
+            <dd class="num">8</dd>
+          </div>
+          <div>
+            <dt>Login</dt>
+            <dd class="num">1</dd>
+          </div>
+        </dl>
+      </div>
+      <div class="entrada-form">
+        <div class="entrada-form-miolo">
+          <div class="plaquinha grande entrada-plaquinha">
+            <img src="/logo/ru.svg" alt="" width="40" height="40" />
+          </div>
+          <h2>Entrar no painel</h2>
+          <p class="sec">Use o e-mail e a senha do seu acesso.</p>
+          <form id="form-entrar" novalidate>
+            <label for="entrar-email">E-mail</label>
+            <input id="entrar-email" name="email" type="email" autocomplete="username" required />
+            <label for="entrar-senha">Senha</label>
+            <input
+              id="entrar-senha"
+              name="senha"
+              type="password"
+              autocomplete="current-password"
+              required
+            />
+            <div class="entrada-linha">
+              <label class="marcar"
+                ><input id="entrar-lembrar" type="checkbox" checked /> Continuar conectado</label
+              >
+              <button type="button" class="link" id="entrar-esqueci">Esqueci minha senha</button>
+            </div>
+            <p class="erro" id="entrar-erro" role="alert" hidden></p>
+            <button type="submit" class="botao ouro largo" id="entrar-botao">Entrar</button>
+          </form>
+          <p class="entrada-nota sec">
+            Primeiro acesso? Use “Esqueci minha senha” para receber o link por e-mail.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Janela do painel (só aparece com sessão). -->
+    <div id="app" class="janela" hidden>
+      <header class="barra-titulo">
+        <div class="semaforo" aria-hidden="true"><i></i><i></i><i></i></div>
+        <div class="plaquinha"><img src="/logo/ru.svg" alt="" width="18" height="18" /></div>
+        <div class="barra-titulo-texto">
+          <b id="titulo-tela">Hoje</b><span> · Painel Rafael Ulian</span>
+        </div>
+        <div class="barra-titulo-direita">
+          <span class="num sec" id="barra-data"></span>
+          <button
+            type="button"
+            class="icone"
+            id="botao-tema"
+            aria-label="Alternar tema claro e escuro"
+            title="Tema"
+          >
+            <svg
+              viewBox="0 0 16 16"
+              width="16"
+              height="16"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+            >
+              <circle cx="8" cy="8" r="3" />
+              <path
+                d="M8 1.5v1.5M8 13v1.5M1.5 8H3M13 8h1.5M3.4 3.4l1 1M11.6 11.6l1 1M12.6 3.4l-1 1M4.4 11.6l-1 1"
+              />
+            </svg>
+          </button>
+        </div>
+      </header>
+      <div class="corpo">
+        <nav class="lateral" aria-label="Navegação">
+          <a href="#hoje" data-tela="hoje">
+            <svg
+              viewBox="0 0 16 16"
+              width="16"
+              height="16"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.6"
+            >
+              <rect x="2" y="2.5" width="12" height="11" rx="2" />
+              <path d="M5 8l2 2 4-4" />
+            </svg>
+            <span>Hoje</span>
+          </a>
+          <a href="#empresas" data-tela="empresas">
+            <svg
+              viewBox="0 0 16 16"
+              width="16"
+              height="16"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.6"
+            >
+              <path
+                d="M2 4.5A1.5 1.5 0 013.5 3H7l1.5 1.5H12.5A1.5 1.5 0 0114 6v6a1.5 1.5 0 01-1.5 1.5h-9A1.5 1.5 0 012 12z"
+              />
+            </svg>
+            <span>Empresas</span>
+          </a>
+          <a href="#config" data-tela="config">
+            <svg
+              viewBox="0 0 16 16"
+              width="16"
+              height="16"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.6"
+            >
+              <circle cx="8" cy="8" r="2.2" />
+              <path
+                d="M8 1.8v1.7M8 12.5v1.7M1.8 8h1.7M12.5 8h1.7M3.6 3.6l1.2 1.2M11.2 11.2l1.2 1.2M12.4 3.6l-1.2 1.2M4.8 11.2l-1.2 1.2"
+              />
+            </svg>
+            <span>Configurações</span>
+          </a>
+          <div class="lateral-rodape">
+            <div class="plaquinha"><img src="/logo/ru.svg" alt="" width="18" height="18" /></div>
+            <div class="lateral-quem">
+              <b id="lateral-nome"></b>
+              <button type="button" class="link" id="botao-sair">Sair</button>
+            </div>
+          </div>
+        </nav>
+        <main id="conteudo" class="conteudo">
+          <section id="tela-hoje" class="tela" hidden></section>
+          <section id="tela-empresas" class="tela" hidden></section>
+          <section id="tela-config" class="tela" hidden></section>
+        </main>
+      </div>
+    </div>
+
+    <div id="aviso" class="aviso" role="status" aria-live="polite" hidden></div>
+    <dialog id="dialogo" class="dialogo"></dialog>
+
+    <script src="/vendor/supabase-js-2.116.0.js"></script>
+    <script type="module" src="/js/app.js"></script>
+  </body>
+</html>
