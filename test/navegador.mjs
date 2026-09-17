@@ -191,6 +191,15 @@ for (const [nome, largura, altura] of [
     await page.waitForSelector('.pastas .pasta')
     conferir((await page.locator('.pastas .pasta').count()) === 4, `${nome}: quatro pastas`)
     await foto('empresas')
+    await page.click('.visual button[title="Ver em cartões"]')
+    await page.waitForSelector('.pastas-grade .pasta')
+    conferir(
+      (await page.locator('.pastas-grade .pasta').count()) === 4,
+      `${nome}: pastas em cartões`,
+    )
+    await foto('empresas-cartoes')
+    await page.click('.visual button[title="Ver em lista"]')
+    await page.waitForSelector('.pastas .pasta')
     await page.click('.pastas .pasta:has-text("Jolô")')
     await page.waitForSelector('.launchpad .azulejo')
     conferir(
