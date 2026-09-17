@@ -37,6 +37,12 @@ export const SISTEMAS = {
       imagem: '/icones/sistemas/central-rafaellos.png',
       icone: G(['#D9B45A', '#3B2E0A'], 'CR'),
     },
+    {
+      nome: 'Saipos',
+      url: 'https://conta.saipos.com.br',
+      site: 'saipos.com.br',
+      icone: G(['#FF7A59', '#7A2210'], 'S'),
+    },
   ],
   outros: [
     {
