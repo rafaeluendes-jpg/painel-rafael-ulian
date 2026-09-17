@@ -420,6 +420,97 @@
   color: var(--ouro-claro);
 }
 
+/* atas: abre e fecha */
+.atas {
+  display: flex;
+  flex-direction: column;
+}
+.ata {
+  border-top: 1px solid var(--fio);
+}
+.ata:first-child {
+  border-top: 0;
+}
+.ata-cabecalho {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 22px 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 14px;
+  background: none;
+  border: 0;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.ata-cabecalho:hover {
+  background: var(--elevado-2);
+}
+.ata.aberta > .ata-cabecalho {
+  background: var(--elevado-2);
+}
+.seta {
+  display: grid;
+  place-items: center;
+  color: var(--sec);
+  transition: transform 0.18s ease;
+}
+.seta.aberta {
+  transform: rotate(90deg);
+  color: var(--ouro);
+}
+.ata-titulo {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.ata-titulo b {
+  font-weight: 600;
+  font-size: 13.5px;
+}
+.ata-titulo .sec {
+  font-size: 12px;
+}
+.ata-resumo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
+  color: var(--sec);
+  white-space: nowrap;
+}
+.ata-resumo .atrasadas {
+  color: var(--erro);
+}
+.ata-resumo .trilho {
+  width: 90px;
+  height: 6px;
+  border-radius: 99px;
+  background: var(--fio);
+  overflow: hidden;
+}
+.ata-resumo .trilho i {
+  display: block;
+  height: 100%;
+  background: var(--ouro);
+}
+.ata-corpo .acoes {
+  border-top: 1px solid var(--fio);
+}
+.ata-botoes {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.plano-rodape {
+  border-radius: 0;
+}
+.ata:last-child .plano-rodape {
+  border-radius: 0 0 var(--raio) var(--raio);
+}
+
 /* ---------------------------------------------------------------- eficiência */
 .eficiencia {
   display: grid;
@@ -868,11 +959,14 @@
     justify-content: flex-start;
     margin-top: 4px;
   }
-  .plano-resumo {
-    margin-left: 0;
-    width: 100%;
-    flex-wrap: wrap;
-    gap: 10px;
+  .ata-cabecalho {
+    grid-template-columns: 18px 1fr;
+  }
+  .ata-resumo {
+    grid-column: 2;
+  }
+  .ata-resumo .trilho {
+    width: 60px;
   }
   .launchpad {
     grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));

@@ -10,13 +10,11 @@ export const SISTEMAS = {
     {
       nome: 'Joia ERP',
       url: 'https://joiagest.com.br',
-      site: 'joiagest.com.br',
       icone: G(['#F0DCA0', '#8A6A14'], 'J'),
     },
     {
       nome: 'Faturamento',
       url: 'https://app.joiagest.com.br',
-      site: 'app.joiagest.com.br',
       icone: G(['#D9B45A', '#5E4508'], 'R$'),
     },
     {
@@ -52,7 +50,6 @@ export const SISTEMAS = {
     {
       nome: 'Central Pessoal',
       url: 'https://painel.daluapp.com',
-      site: 'painel.daluapp.com',
       icone: G(['#F0DCA0', '#6B5210'], 'CP'),
     },
     {

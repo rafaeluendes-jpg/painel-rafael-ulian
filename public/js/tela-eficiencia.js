@@ -8,6 +8,7 @@ import {
   aoMudar,
   itemAplica,
   acaoAtrasada,
+  acoesAtivas,
 } from './estado.js'
 import { dados } from './dados.js'
 import { ultimosDias, dataBR, diaDoMes } from './datas.js'
@@ -112,13 +113,14 @@ function porFrente() {
     const feitas = itens.filter((i) => marcacaoDoItem(i.id)).length
     return { nome: pasta.nome, cor: pasta.cor, feitas, total: itens.length }
   })
-  if (estado.acoes.length) {
+  const acoes = acoesAtivas()
+  if (acoes.length) {
     linhas.push({
       nome: 'Plano de ação',
       cor: '#F0DCA0',
-      feitas: estado.acoes.filter((a) => a.status === 'feito').length,
-      total: estado.acoes.length,
-      atrasadas: estado.acoes.filter((a) => acaoAtrasada(a)).length,
+      feitas: acoes.filter((a) => a.status === 'feito').length,
+      total: acoes.length,
+      atrasadas: acoes.filter((a) => acaoAtrasada(a)).length,
     })
   }
   return linhas.map((l) => {

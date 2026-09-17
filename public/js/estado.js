@@ -11,6 +11,7 @@ export const estado = {
   itens: [], // ativos
   marcacoes: [], // de hoje
   acoes: [],
+  atas: [],
   permissoes: [], // as que me foram concedidas (quando sou convidada)
   hoje: hojeISO(),
   pronto: false,
@@ -32,26 +33,28 @@ export async function carregarTudo(sessao) {
   let perfil = await dados.perfil(estado.uid)
   if (!perfil) perfil = await dados.entrar()
   if (!perfil) throw new Error('sem_convite')
-  const [pastas, itens, marcacoes, acoes, permissoes] = await Promise.all([
+  const [pastas, itens, marcacoes, acoes, atas, permissoes] = await Promise.all([
     dados.pastas(),
     dados.itensAtivos(),
     dados.marcacoesDoDia(estado.hoje),
     dados.acoes(),
+    dados.atas(),
     dados.minhasPermissoes(estado.uid),
   ])
-  Object.assign(estado, { perfil, pastas, itens, marcacoes, acoes, permissoes, pronto: true })
+  Object.assign(estado, { perfil, pastas, itens, marcacoes, acoes, atas, permissoes, pronto: true })
   avisarMudanca('tudo')
 }
 
 /** Recarrega só o que muda ao longo do dia (marcações, itens, ações). */
 export async function recarregarDia() {
   const hoje = hojeISO()
-  const [itens, marcacoes, acoes] = await Promise.all([
+  const [itens, marcacoes, acoes, atas] = await Promise.all([
     dados.itensAtivos(),
     dados.marcacoesDoDia(hoje),
     dados.acoes(),
+    dados.atas(),
   ])
-  Object.assign(estado, { hoje, itens, marcacoes, acoes })
+  Object.assign(estado, { hoje, itens, marcacoes, acoes, atas })
   avisarMudanca('dia')
 }
 
@@ -96,6 +99,26 @@ export function pastaPorId(id) {
 
 export function acaoPorId(id) {
   return estado.acoes.find((a) => a.id === id) || null
+}
+
+export function atasAtivas() {
+  return estado.atas.filter((a) => !a.concluida_em)
+}
+
+export function atasArquivadas() {
+  return estado.atas
+    .filter((a) => a.concluida_em)
+    .sort((a, b) => b.concluida_em.localeCompare(a.concluida_em))
+}
+
+export function acoesDaAta(ataId) {
+  return estado.acoes.filter((a) => a.ata_id === ataId)
+}
+
+/** Ações das atas que ainda estão em andamento (não arquivadas). */
+export function acoesAtivas() {
+  const ativas = new Set(atasAtivas().map((a) => a.id))
+  return estado.acoes.filter((a) => ativas.has(a.ata_id))
 }
 
 /** Ação única passada da data sem "feito"; rotina que nem começou depois da data. */

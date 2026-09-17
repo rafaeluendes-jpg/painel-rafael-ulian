@@ -37,6 +37,9 @@ export const dados = {
   async acoes() {
     return ok(await sb.from('painel_acoes').select('*').order('comeca').order('ordem'))
   },
+  async atas() {
+    return ok(await sb.from('painel_atas').select('*').order('criado_em'))
+  },
   async minhasPermissoes(uid) {
     return ok(await sb.from('painel_permissoes').select('*').eq('convidado_id', uid))
   },
@@ -95,14 +98,20 @@ export const dados = {
   },
 
   // ------------------------------------------------------------ plano de ação
+  async criarAta(ata) {
+    return ok(await sb.from('painel_atas').insert(ata).select().single())
+  },
+  async atualizarAta(id, mudancas) {
+    return ok(await sb.from('painel_atas').update(mudancas).eq('id', id).select().single())
+  },
+  async apagarAta(id) {
+    return ok(await sb.from('painel_atas').delete().eq('id', id))
+  },
   async criarAcoes(linhas) {
     return ok(await sb.from('painel_acoes').insert(linhas).select())
   },
   async atualizarAcao(id, mudancas) {
     return ok(await sb.from('painel_acoes').update(mudancas).eq('id', id).select().single())
-  },
-  async apagarAcoesDaPasta(pastaId) {
-    return ok(await sb.from('painel_acoes').delete().eq('pasta_id', pastaId))
   },
 
   // ------------------------------------------------------------ pastas

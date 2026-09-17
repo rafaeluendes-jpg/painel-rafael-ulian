@@ -13,6 +13,7 @@ const tabelas = {
   painel_itens: [],
   painel_marcacoes: [],
   painel_acoes: [],
+  painel_atas: [],
   painel_permissoes: [],
   painel_convites: [],
   painel_preferencias: [],
@@ -355,6 +356,10 @@ export function criarMock() {
     if (req.method === 'DELETE') {
       const alvos = tabela.filter(filtro)
       for (const l of alvos) tabela.splice(tabela.indexOf(l), 1)
+      if (nome === 'painel_atas') {
+        const ids = new Set(alvos.map((a) => a.id))
+        tabelas.painel_acoes = tabelas.painel_acoes.filter((a) => !ids.has(a.ata_id))
+      }
       return responder(200, alvos)
     }
     return responder(405, {})

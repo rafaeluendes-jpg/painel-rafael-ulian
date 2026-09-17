@@ -1,6 +1,6 @@
 // Service worker: guarda a casca do painel para abrir rápido e instalado no celular.
 // Dados nunca são guardados aqui (vão sempre ao Supabase).
-const VERSAO = 'ru-2026-09-17-1'
+const VERSAO = 'ru-2026-09-17-2'
 const CASCA = [
   '/',
   '/index.html',
@@ -21,6 +21,7 @@ const CASCA = [
   '/js/tela-entrada.js',
   '/js/tela-hoje.js',
   '/js/tela-plano.js',
+  '/js/tela-relatorios.js',
   '/js/tema.js',
   '/vendor/supabase-js-2.116.0.js',
   '/logo/ru.svg',

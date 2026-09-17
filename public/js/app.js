@@ -8,8 +8,14 @@ import { montarEntrada, mostrarEntrada } from './tela-entrada.js'
 import { montarHoje } from './tela-hoje.js'
 import { montarEmpresas } from './tela-empresas.js'
 import { montarConfig } from './tela-config.js'
+import { montarRelatorios } from './tela-relatorios.js'
 
-const TITULOS = { hoje: 'Hoje', empresas: 'Empresas', config: 'Configurações' }
+const TITULOS = {
+  hoje: 'Hoje',
+  empresas: 'Empresas',
+  relatorios: 'Relatórios',
+  config: 'Configurações',
+}
 let pedirSenha = /type=(recovery|magiclink|invite|signup)/.test(location.hash)
 let sessaoAtual = null
 let montando = false
@@ -41,6 +47,7 @@ function desenharTela() {
 
   if (tela === 'hoje') montarHoje($('#tela-hoje'))
   else if (tela === 'empresas') montarEmpresas($('#tela-empresas'), parametro)
+  else if (tela === 'relatorios') montarRelatorios($('#tela-relatorios'))
   else montarConfig($('#tela-config'))
 
   if (pastaComFoco) $(`[data-pasta="${pastaComFoco}"] .novo-item input`)?.focus()
@@ -53,7 +60,8 @@ async function montarPainel(sessao) {
     await carregarTudo(sessao)
     $('#entrada').hidden = true
     $('#app').hidden = false
-    if (!/^#(hoje|empresas|config)/.test(location.hash)) history.replaceState(null, '', '#hoje')
+    if (!/^#(hoje|empresas|relatorios|config)/.test(location.hash))
+      history.replaceState(null, '', '#hoje')
     desenharTela()
     if (pedirSenha) {
       pedirSenha = false
