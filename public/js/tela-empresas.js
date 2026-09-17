@@ -45,6 +45,63 @@ function miniIcone(sistema) {
   return caixa
 }
 
+const CHAVE_VISUAL = 'ru.empresas.visual'
+function visualAtual() {
+  try {
+    return localStorage.getItem(CHAVE_VISUAL) === 'grade' ? 'grade' : 'lista'
+  } catch {
+    return 'lista'
+  }
+}
+function definirVisual(v) {
+  try {
+    localStorage.setItem(CHAVE_VISUAL, v)
+  } catch {
+    /* sem armazenamento: vale só nesta visita */
+  }
+}
+
+/** Pasta solta (grade): pasta grande centralizada, nome e contagem embaixo. */
+function cartaoPasta(pasta) {
+  const n = sistemasDaPasta(pasta).length
+  return el(
+    'a',
+    { class: 'pasta pasta-solta', href: `#empresas/${pasta.id}`, dataset: { pasta: pasta.id } },
+    el('span', { class: 'pasta-dobra' }, dobra(pasta.cor || '#D9B45A')),
+    el('b', {}, pasta.nome),
+    el('span', {}, n === 1 ? '1 sistema' : `${n} sistemas`),
+  )
+}
+
+const LISTA = 'M2 4h12M2 8h12M2 12h12'
+const GRADE = 'M2.5 2.5h4v4h-4zM9.5 2.5h4v4h-4zM2.5 9.5h4v4h-4zM9.5 9.5h4v4h-4z'
+
+function seletorDeVisual(raiz, pastaId) {
+  const atual = visualAtual()
+  const botao = (v, caminho, rotulo) =>
+    el(
+      'button',
+      {
+        type: 'button',
+        class: `icone${atual === v ? ' ativo' : ''}`,
+        title: rotulo,
+        'aria-label': rotulo,
+        'aria-pressed': String(atual === v),
+        onClick: () => {
+          definirVisual(v)
+          montarEmpresas(raiz, pastaId)
+        },
+      },
+      icone(caminho, 16),
+    )
+  return el(
+    'div',
+    { class: 'visual' },
+    botao('lista', LISTA, 'Ver em lista'),
+    botao('grade', GRADE, 'Ver em cartões'),
+  )
+}
+
 function linhaPasta(pasta) {
   const sistemas = sistemasDaPasta(pasta)
   const n = sistemas.length
@@ -106,8 +163,11 @@ export function montarEmpresas(raiz, pastaId) {
           el('h1', {}, 'Empresas'),
           el('p', {}, 'Escolha a pasta; dentro estão os sistemas.'),
         ),
+        seletorDeVisual(raiz, pastaId),
       ),
-      el('div', { class: 'cartao pastas' }, estado.pastas.map(linhaPasta)),
+      visualAtual() === 'grade'
+        ? el('div', { class: 'pastas-grade' }, estado.pastas.map(cartaoPasta))
+        : el('div', { class: 'cartao pastas' }, estado.pastas.map(linhaPasta)),
     )
     return
   }

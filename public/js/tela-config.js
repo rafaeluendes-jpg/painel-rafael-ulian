@@ -354,10 +354,66 @@ function pastas() {
         salvar({ nome: v })
       })
       cor.addEventListener('change', () => salvar({ cor: cor.value }))
+      // Subir/descer: troca a ordem com a vizinha e grava as duas.
+      const minhas = estado.pastas.filter((p) => p.dono_id === estado.uid)
+      const indice = minhas.indexOf(pasta)
+      const mover = async (direcao) => {
+        const vizinha = minhas[indice + direcao]
+        if (!vizinha) return
+        try {
+          const a = await dados.atualizarPasta(pasta.id, { ordem: vizinha.ordem })
+          const b = await dados.atualizarPasta(vizinha.id, { ordem: pasta.ordem })
+          Object.assign(pasta, a)
+          Object.assign(vizinha, b)
+          if (pasta.ordem === vizinha.ordem) {
+            // Ordens iguais (pastas antigas): numera de novo pela posição.
+            minhas.splice(indice, 1)
+            minhas.splice(indice + direcao, 0, pasta)
+            for (const [i, x] of minhas.entries()) {
+              if (x.ordem !== i + 1)
+                Object.assign(x, await dados.atualizarPasta(x.id, { ordem: i + 1 }))
+            }
+          }
+          estado.pastas.sort((x, y) => x.ordem - y.ordem)
+          avisarMudanca('pastas')
+          desenhar()
+        } catch (e) {
+          avisar(mensagemDeErro(e, 'Não consegui mudar a ordem.'), true)
+        }
+      }
+      const setas = el(
+        'span',
+        { class: 'setas-ordem' },
+        el(
+          'button',
+          {
+            type: 'button',
+            class: 'icone',
+            title: 'Subir',
+            'aria-label': `Subir ${pasta.nome}`,
+            disabled: indice === 0,
+            onClick: () => mover(-1),
+          },
+          '↑',
+        ),
+        el(
+          'button',
+          {
+            type: 'button',
+            class: 'icone',
+            title: 'Descer',
+            'aria-label': `Descer ${pasta.nome}`,
+            disabled: indice === minhas.length - 1,
+            onClick: () => mover(1),
+          },
+          '↓',
+        ),
+      )
       lista.append(
         el(
           'li',
           {},
+          setas,
           cor,
           nome,
           el(
