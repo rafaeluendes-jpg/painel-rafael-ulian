@@ -145,16 +145,58 @@ export function linhaAcao(acao, pasta, somenteLeitura = false) {
     acao.titulo,
     acao.quem ? el('span', { class: 'quem' }, ` · ${acao.quem}`) : null,
   )
+  // Caixa na frente: marcar = Feito (risca), desmarcar = volta para "Em andamento".
+  const caixa = el('input', {
+    type: 'checkbox',
+    class: 'acao-caixa',
+    'aria-label': `Concluir ${acao.titulo}`,
+    disabled: !pode,
+  })
+  caixa.checked = acao.status === 'feito'
+  caixa.addEventListener('change', async () => {
+    caixa.disabled = true
+    try {
+      await mudarStatusDaAcao(acao, caixa.checked ? 'feito' : 'andando')
+    } catch (e) {
+      caixa.checked = !caixa.checked
+      caixa.disabled = !pode
+      avisar(mensagemDeErro(e, 'Não consegui mudar o status.'), true)
+    }
+  })
+  const observar = el(
+    'button',
+    {
+      type: 'button',
+      class: 'link observar',
+      onClick: () => {
+        detalhesAbertos.add(acao.id)
+        montarPlano()
+        setTimeout(
+          () => raizPlano?.querySelector(`[data-acao="${acao.id}"] .nota input`)?.focus(),
+          50,
+        )
+      },
+    },
+    acao.nota ? 'editar observação' : '+ observação',
+  )
   return el(
     'div',
     { class: `acao${acao.status === 'feito' ? ' feita' : ''}`, dataset: { acao: acao.id } },
+    caixa,
     el(
       'div',
       { class: 'quando num' },
       el('b', {}, String(diaDoMes(acao.comeca)).padStart(2, '0')),
       `${DIAS_SEMANA[diaDaSemana(acao.comeca)]} · ${MESES[mesIndice(acao.comeca)]}`,
     ),
-    el('div', { class: 'texto' }, titulo, el('div', { class: 'sub' }, subtitulo(acao))),
+    el(
+      'div',
+      { class: 'texto' },
+      titulo,
+      el('div', { class: 'sub' }, subtitulo(acao)),
+      acao.nota ? el('div', { class: 'obs' }, '“', acao.nota, '”') : null,
+      pode ? el('div', { class: 'sub' }, observar) : null,
+    ),
     el(
       'div',
       { class: 'estado' },

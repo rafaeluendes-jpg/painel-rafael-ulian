@@ -114,8 +114,18 @@ function coluna(pasta) {
     maxlength: '200',
     autocomplete: 'off',
   })
-  campo.addEventListener('keydown', async (evento) => {
-    if (evento.key !== 'Enter') return
+  const adicionar = el(
+    'button',
+    {
+      type: 'submit',
+      class: 'mais',
+      title: 'Adicionar',
+      'aria-label': `Adicionar em ${pasta.nome}`,
+    },
+    '+',
+  )
+  const formulario = el('form', { class: 'novo-item', novalidate: true }, campo, adicionar)
+  formulario.addEventListener('submit', async (evento) => {
     evento.preventDefault()
     const texto = campo.value.trim()
     if (!texto) return
@@ -142,7 +152,7 @@ function coluna(pasta) {
       el('span', { class: 'fracao num' }, `${feitos}/${itens.length}`),
     ),
     lista,
-    podeEditar(pasta) ? el('div', { class: 'novo-item' }, campo) : null,
+    podeEditar(pasta) ? formulario : null,
   )
 }
 

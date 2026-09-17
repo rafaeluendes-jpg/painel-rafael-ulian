@@ -153,6 +153,15 @@ for (const [nome, largura, altura] of [
       await page.locator('.ata .acao').first().locator('.pilula.andando').click()
       await page.waitForSelector('.ata .acao .pilula.andando.ativa')
       conferir(true, `${nome}: status da ação muda`)
+      await page.locator('.ata .acao').nth(1).locator('.acao-caixa').check()
+      await page.waitForSelector('.ata .acao.feita')
+      conferir(
+        (await page.locator('.ata .acao.feita').count()) === 1,
+        `${nome}: caixa da ação risca a ação`,
+      )
+      await page.locator('.ata .acao.feita .acao-caixa').uncheck()
+      await page.waitForSelector('.ata .acao.feita', { state: 'detached' })
+      conferir(true, `${nome}: desmarcar a caixa reabre a ação`)
       await page.locator('.ata .acao').first().locator('.titulo').click()
       await page.waitForSelector('.acao-detalhe')
       await foto('plano')
