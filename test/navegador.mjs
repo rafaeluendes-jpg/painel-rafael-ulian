@@ -165,6 +165,13 @@ for (const [nome, largura, altura] of [
       await page.locator('.ata .acao').first().locator('.titulo').click()
       await page.waitForSelector('.acao-detalhe')
       await foto('plano')
+      await page.fill('.acao-detalhe .nota-form input', 'Semana 1: Netão pediu prazo')
+      await page.click('.acao-detalhe .nota-form .botao')
+      await page.waitForSelector('.acao-detalhe', { state: 'detached' })
+      conferir(
+        (await page.locator('.ata .acao .obs').first().textContent()).includes('Netão'),
+        `${nome}: observação salva recolhe o detalhe e fica à vista`,
+      )
       // arquivar: vai para Relatórios e volta
       await page.click('.ata-botoes .botao')
       await page.waitForSelector('#dialogo[open]')
