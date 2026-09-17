@@ -17,7 +17,7 @@ export const SISTEMAS = {
     },
     {
       nome: 'Central Jolô',
-      url: 'https://jolo-central.netlify.app',
+      url: 'https://centraljolo.com.br',
       icone: G(['#C9A227', '#2E2408'], 'CJ'),
     },
   ],
