@@ -49,7 +49,7 @@ export const SISTEMAS = {
       nome: 'Saipos Gestão',
       url: 'https://play.google.com/store/apps/details?id=com.saipos.mobilemanager',
       android:
-        'intent://#Intent;package=com.saipos.mobilemanager;S.browser_fallback_url=https%3A%2F%2Fplay.google.com%2Fstore%2Fapps%2Fdetails%3Fid%3Dcom.saipos.mobilemanager;end',
+        'intent://#Intent;package=com.saipos.mobilemanager;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;S.browser_fallback_url=https%3A%2F%2Fplay.google.com%2Fstore%2Fapps%2Fdetails%3Fid%3Dcom.saipos.mobilemanager;end',
       endereco: 'app · faturamento ao vivo',
       site: 'saipos.com.br',
       selo: 'R$',
