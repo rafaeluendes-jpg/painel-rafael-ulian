@@ -3,19 +3,63 @@ import { el, limpar, icone } from './dom.js'
 import { estado, pastaPorId } from './estado.js'
 import { sistemasDaPasta, enderecoCurto, desenhoDoAzulejo, iconeDoSite } from './sistemas.js'
 
-const PASTA =
-  'M2 4.5A1.5 1.5 0 013.5 3H7l1.5 1.5H12.5A1.5 1.5 0 0114 6v6a1.5 1.5 0 01-1.5 1.5h-9A1.5 1.5 0 012 12z'
 const VOLTAR = 'M10 3L5 8l5 5'
+const VOLTAR_INVERTIDO = 'M6 3l5 5-5 5'
 
-function cartaoPasta(pasta) {
-  const n = sistemasDaPasta(pasta).length
-  const ic = el('div', { class: 'pasta-icone' }, icone(PASTA, 22))
-  ic.style.setProperty('--cor', pasta.cor || '#D9B45A')
+/** Pasta desenhada (com aba), na cor da pasta. */
+function dobra(cor) {
+  const NS = 'http://www.w3.org/2000/svg'
+  const svg = document.createElementNS(NS, 'svg')
+  svg.setAttribute('viewBox', '0 0 64 52')
+  svg.setAttribute('class', 'dobra')
+  svg.setAttribute('aria-hidden', 'true')
+  const tras = document.createElementNS(NS, 'path')
+  tras.setAttribute(
+    'd',
+    'M4 10a4 4 0 0 1 4-4h14l5 5h29a4 4 0 0 1 4 4v27a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4z',
+  )
+  tras.style.fill = `color-mix(in srgb, ${cor} 45%, #000)`
+  const frente = document.createElementNS(NS, 'path')
+  frente.setAttribute('d', 'M4 20h56v22a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4z')
+  frente.style.fill = cor
+  const brilho = document.createElementNS(NS, 'path')
+  brilho.setAttribute('d', 'M4 20h56v2H4z')
+  brilho.setAttribute('fill', 'rgba(255,255,255,0.18)')
+  svg.append(tras, frente, brilho)
+  return svg
+}
+
+/** Ícone pequeno de um sistema (imagem verdadeira, favicon ou letras). */
+function miniIcone(sistema) {
+  const origem = sistema.imagem || (sistema.site ? iconeDoSite(sistema.site) : null)
+  const caixa = el('span', { class: 'mini' })
+  caixa.style.background = `linear-gradient(150deg, ${sistema.icone.cores[0]}, ${sistema.icone.cores[1]})`
+  if (origem) {
+    const img = el('img', { src: origem, alt: '', loading: 'lazy' })
+    img.addEventListener('error', () => {
+      img.remove()
+      caixa.textContent = sistema.icone.letras
+    })
+    caixa.append(img)
+  } else caixa.textContent = sistema.icone.letras
+  return caixa
+}
+
+function linhaPasta(pasta) {
+  const sistemas = sistemasDaPasta(pasta)
+  const n = sistemas.length
   return el(
     'a',
-    { class: 'cartao pasta', href: `#empresas/${pasta.id}`, dataset: { pasta: pasta.id } },
-    ic,
-    el('div', {}, el('h3', {}, pasta.nome), el('p', {}, n === 1 ? '1 sistema' : `${n} sistemas`)),
+    { class: 'pasta', href: `#empresas/${pasta.id}`, dataset: { pasta: pasta.id } },
+    el('span', { class: 'pasta-dobra' }, dobra(pasta.cor || '#D9B45A')),
+    el(
+      'span',
+      { class: 'pasta-texto' },
+      el('b', {}, pasta.nome),
+      el('span', {}, n === 1 ? '1 sistema' : `${n} sistemas`),
+    ),
+    el('span', { class: 'pasta-minis' }, sistemas.slice(0, 4).map(miniIcone)),
+    el('span', { class: 'chev' }, icone(VOLTAR_INVERTIDO, 14)),
   )
 }
 
@@ -63,7 +107,7 @@ export function montarEmpresas(raiz, pastaId) {
           el('p', {}, 'Escolha a pasta; dentro estão os sistemas.'),
         ),
       ),
-      el('div', { class: 'pastas' }, estado.pastas.map(cartaoPasta)),
+      el('div', { class: 'cartao pastas' }, estado.pastas.map(linhaPasta)),
     )
     return
   }
