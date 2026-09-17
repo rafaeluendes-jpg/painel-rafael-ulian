@@ -637,6 +637,7 @@
   text-align: left;
   cursor: pointer;
   color: inherit;
+  text-decoration: none;
   transition:
     transform 0.15s,
     border-color 0.15s;
