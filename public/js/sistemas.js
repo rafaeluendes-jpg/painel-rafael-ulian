@@ -39,8 +39,8 @@ export const SISTEMAS = {
     },
     {
       nome: 'Saipos',
-      url: 'https://conta.saipos.com.br',
-      site: 'saipos.com.br',
+      url: 'https://conta.saipos.com/#/access/login',
+      site: 'conta.saipos.com',
       icone: G(['#FF7A59', '#7A2210'], 'S'),
     },
   ],
