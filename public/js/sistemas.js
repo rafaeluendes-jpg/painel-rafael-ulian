@@ -1,5 +1,7 @@
 // Os sistemas de cada pasta (Empresas). A pasta do banco liga-se aqui pela `chave`.
-// Cada ícone é um desenho simples em SVG, sem depender de logo externa.
+// `imagem`: ícone verdadeiro do aplicativo, guardado em /icones/sistemas/.
+// `site`: quando não temos o arquivo, o ícone vem do próprio site (serviço de favicon).
+// `icone`: letras de reserva, usadas só se a imagem não carregar.
 
 const G = (cores, letras) => ({ cores, letras })
 
@@ -8,16 +10,19 @@ export const SISTEMAS = {
     {
       nome: 'Joia ERP',
       url: 'https://joiagest.com.br',
+      site: 'joiagest.com.br',
       icone: G(['#F0DCA0', '#8A6A14'], 'J'),
     },
     {
       nome: 'Faturamento',
       url: 'https://app.joiagest.com.br',
+      site: 'app.joiagest.com.br',
       icone: G(['#D9B45A', '#5E4508'], 'R$'),
     },
     {
       nome: 'Central Jolô',
       url: 'https://centraljolo.com.br',
+      imagem: '/icones/sistemas/central-jolo.png',
       icone: G(['#C9A227', '#2E2408'], 'CJ'),
     },
   ],
@@ -25,11 +30,13 @@ export const SISTEMAS = {
     {
       nome: 'Sistema Inteligente',
       url: 'https://sistema-inteligente-erp.onrender.com',
+      imagem: '/icones/sistemas/sistema-inteligente.png',
       icone: G(['#EFEBE2', '#4A4438'], 'SI'),
     },
     {
       nome: "Central Rafaello's",
       url: 'https://rafaellos.usacademyadm.workers.dev',
+      imagem: '/icones/sistemas/central-rafaellos.png',
       icone: G(['#D9B45A', '#3B2E0A'], 'CR'),
     },
   ],
@@ -37,6 +44,7 @@ export const SISTEMAS = {
     {
       nome: 'R2ON',
       url: 'https://r2on.r2on.workers.dev',
+      imagem: '/icones/sistemas/r2on.png',
       icone: G(['#9C958A', '#1B1A17'], 'R2'),
     },
   ],
@@ -44,11 +52,13 @@ export const SISTEMAS = {
     {
       nome: 'Central Pessoal',
       url: 'https://painel.daluapp.com',
+      site: 'painel.daluapp.com',
       icone: G(['#F0DCA0', '#6B5210'], 'CP'),
     },
     {
       nome: 'Dalu',
       url: 'https://daluapp.com',
+      site: 'daluapp.com',
       icone: G(['#C9A227', '#17130A'], 'D'),
     },
   ],
@@ -67,7 +77,12 @@ export function enderecoCurto(url) {
   return url.replace(/^https?:\/\//, '').replace(/\/$/, '')
 }
 
-/** Desenho do azulejo: letras douradas/pretas sobre o degradê. */
+/** Endereço do ícone pelo serviço de favicon (para sites de terceiros). */
+export function iconeDoSite(site) {
+  return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(site)}&sz=128`
+}
+
+/** Desenho de reserva do azulejo: letras sobre o degradê. */
 export function desenhoDoAzulejo(icone) {
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
   svg.setAttribute('viewBox', '0 0 64 64')

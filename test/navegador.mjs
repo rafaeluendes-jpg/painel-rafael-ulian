@@ -3,7 +3,7 @@
 // voltar, abrir configurações, alternar o tema. Nenhum erro de console.
 // Rode: node test/navegador.mjs   (fotos em /tmp/provas-painel)
 import { chromium } from '@playwright/test'
-import { mkdirSync } from 'node:fs'
+import { mkdirSync, readFileSync } from 'node:fs'
 import { criarMock, USUARIO, SENHA } from './mock-supabase.mjs'
 import { criarServidorEstatico } from './servidor.mjs'
 
@@ -37,6 +37,14 @@ for (const [nome, largura, altura] of [
   // Sem internet no teste: as fontes do Google não carregam (o painel usa as de reserva).
   await ctx.route(/fonts\.(googleapis|gstatic)\.com/, (r) =>
     r.fulfill({ status: 200, contentType: 'text/css', body: '' }),
+  )
+  // Sem internet no teste: o serviço de favicon devolve um PNG local.
+  await ctx.route(/www\.google\.com\/s2\/favicons/, (r) =>
+    r.fulfill({
+      status: 200,
+      contentType: 'image/png',
+      body: readFileSync(new URL('../public/icones/icone-192.png', import.meta.url)),
+    }),
   )
   let esperandoErroDeLogin = false
   page.on('console', (m) => {
@@ -158,6 +166,15 @@ for (const [nome, largura, altura] of [
   conferir(
     (await page.locator('.launchpad .azulejo').first().getAttribute('target')) === '_blank',
     `${nome}: ícone abre em aba nova`,
+  )
+  await page.waitForFunction(() =>
+    [...document.querySelectorAll('.azulejo-icone img')].every(
+      (i) => i.complete && i.naturalWidth > 0,
+    ),
+  )
+  conferir(
+    (await page.locator('.azulejo-icone img.cheio').count()) === 1,
+    `${nome}: ícone verdadeiro da Central Jolô carregado`,
   )
   await foto('sistemas')
   await page.click('.voltar')

@@ -22,7 +22,7 @@ const CSP = [
   "script-src 'self'",
   "style-src 'self' https://fonts.googleapis.com",
   'font-src https://fonts.gstatic.com',
-  "img-src 'self' data:",
+  "img-src 'self' data: https://www.google.com",
   "connect-src 'self' https://*.supabase.co wss://*.supabase.co http://127.0.0.1:* http://localhost:*",
   "manifest-src 'self'",
   "worker-src 'self'",
