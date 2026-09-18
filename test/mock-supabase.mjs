@@ -14,6 +14,8 @@ const tabelas = {
   painel_marcacoes: [],
   painel_acoes: [],
   painel_atas: [],
+  painel_listas: [],
+  painel_lista_itens: [],
   painel_permissoes: [],
   painel_convites: [],
   painel_preferencias: [],
@@ -359,6 +361,10 @@ export function criarMock() {
       if (nome === 'painel_atas') {
         const ids = new Set(alvos.map((a) => a.id))
         tabelas.painel_acoes = tabelas.painel_acoes.filter((a) => !ids.has(a.ata_id))
+      }
+      if (nome === 'painel_listas') {
+        const ids = new Set(alvos.map((a) => a.id))
+        tabelas.painel_lista_itens = tabelas.painel_lista_itens.filter((i) => !ids.has(i.lista_id))
       }
       return responder(200, alvos)
     }

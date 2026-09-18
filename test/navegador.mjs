@@ -202,6 +202,40 @@ for (const [nome, largura, altura] of [
       conferir(!(await rolaDeLado()), `${nome}: plano não rola de lado`)
     }
 
+    // ---------------- lançamento: nova lista, itens, marcar, zerar
+    await page.click('.lateral a[data-tela="lancamento"]')
+    await page.waitForSelector('#nova-lista')
+    page.once('dialog', (d) => d.accept('Produto novo'))
+    await page.click('#nova-lista')
+    await page.waitForSelector('.lista .novo-item input')
+    for (const texto of ['Ficha técnica', 'Foto do produto', 'Cadastrar no Saipos']) {
+      await page.fill('.lista .novo-item input', texto)
+      await page.click('.lista .novo-item .mais')
+      await page.waitForSelector(`.lista .item:has-text("${texto}")`)
+    }
+    conferir((await page.locator('.lista .item').count()) === 3, `${nome}: três itens na lista`)
+    await page.locator('.lista .item input[type=checkbox]').first().check()
+    await page.waitForSelector('.lista .item.feito')
+    conferir(
+      (await page.textContent('.lista .fracao')) === '1/3',
+      `${nome}: item da lista riscado (1/3)`,
+    )
+    await foto('lancamento')
+    await page.click('.lista-rodape .botao')
+    await page.waitForSelector('#dialogo[open]')
+    await page.click('#dialogo .botao.ouro')
+    await page.waitForSelector('.lista .item.feito', { state: 'detached' })
+    conferir(
+      (await page.textContent('.lista .fracao')) === '0/3',
+      `${nome}: zerar desmarca tudo e mantém os itens`,
+    )
+    page.once('dialog', (d) => d.accept())
+    await page.click('.lista-rodape .link.perigo')
+    await page.waitForSelector('#dialogo[open]')
+    await page.click('#dialogo .botao.ouro')
+    await page.waitForSelector('.lista', { state: 'detached' })
+    conferir(true, `${nome}: lista apagada`)
+
     // ---------------- empresas: pastas → sistemas → voltar
     await page.click('.lateral a[data-tela="empresas"]')
     await page.waitForSelector('.pastas .pasta')

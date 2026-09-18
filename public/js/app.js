@@ -9,10 +9,12 @@ import { montarHoje } from './tela-hoje.js'
 import { montarEmpresas } from './tela-empresas.js'
 import { montarConfig } from './tela-config.js'
 import { montarRelatorios } from './tela-relatorios.js'
+import { montarLancamento } from './tela-lancamento.js'
 
 const TITULOS = {
   hoje: 'Hoje',
   empresas: 'Empresas',
+  lancamento: 'Lançamento',
   relatorios: 'Relatórios',
   config: 'Configurações',
 }
@@ -47,6 +49,7 @@ function desenharTela() {
 
   if (tela === 'hoje') montarHoje($('#tela-hoje'))
   else if (tela === 'empresas') montarEmpresas($('#tela-empresas'), parametro)
+  else if (tela === 'lancamento') montarLancamento($('#tela-lancamento'))
   else if (tela === 'relatorios') montarRelatorios($('#tela-relatorios'))
   else montarConfig($('#tela-config'))
 
@@ -60,7 +63,7 @@ async function montarPainel(sessao) {
     await carregarTudo(sessao)
     $('#entrada').hidden = true
     $('#app').hidden = false
-    if (!/^#(hoje|empresas|relatorios|config)/.test(location.hash))
+    if (!/^#(hoje|empresas|lancamento|relatorios|config)/.test(location.hash))
       history.replaceState(null, '', '#hoje')
     desenharTela()
     if (pedirSenha) {

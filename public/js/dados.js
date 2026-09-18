@@ -114,6 +114,43 @@ export const dados = {
     return ok(await sb.from('painel_acoes').update(mudancas).eq('id', id).select().single())
   },
 
+  // ------------------------------------------------------------ checklists de lançamento
+  async listas() {
+    return ok(await sb.from('painel_listas').select('*').order('ordem').order('criado_em'))
+  },
+  async itensDeListas() {
+    return ok(await sb.from('painel_lista_itens').select('*').order('ordem').order('criado_em'))
+  },
+  async criarLista(uid, nome, ordem) {
+    return ok(
+      await sb.from('painel_listas').insert({ dono_id: uid, nome, ordem }).select().single(),
+    )
+  },
+  async atualizarLista(id, mudancas) {
+    return ok(await sb.from('painel_listas').update(mudancas).eq('id', id).select().single())
+  },
+  async apagarLista(id) {
+    return ok(await sb.from('painel_listas').delete().eq('id', id))
+  },
+  async criarItemDeLista(lista, texto, ordem) {
+    return ok(
+      await sb
+        .from('painel_lista_itens')
+        .insert({ lista_id: lista.id, dono_id: lista.dono_id, texto, ordem })
+        .select()
+        .single(),
+    )
+  },
+  async marcarItemDeLista(id, feito) {
+    return ok(await sb.from('painel_lista_itens').update({ feito }).eq('id', id).select().single())
+  },
+  async apagarItemDeLista(id) {
+    return ok(await sb.from('painel_lista_itens').delete().eq('id', id))
+  },
+  async zerarLista(listaId) {
+    return ok(await sb.from('painel_lista_itens').update({ feito: false }).eq('lista_id', listaId))
+  },
+
   // ------------------------------------------------------------ pastas
   async atualizarPasta(id, mudancas) {
     return ok(await sb.from('painel_pastas').update(mudancas).eq('id', id).select().single())

@@ -12,6 +12,8 @@ export const estado = {
   marcacoes: [], // de hoje
   acoes: [],
   atas: [],
+  listas: [],
+  listaItens: [],
   permissoes: [], // as que me foram concedidas (quando sou convidada)
   hoje: hojeISO(),
   pronto: false,
@@ -33,15 +35,30 @@ export async function carregarTudo(sessao) {
   let perfil = await dados.perfil(estado.uid)
   if (!perfil) perfil = await dados.entrar()
   if (!perfil) throw new Error('sem_convite')
-  const [pastas, itens, marcacoes, acoes, atas, permissoes] = await Promise.all([
-    dados.pastas(),
-    dados.itensAtivos(),
-    dados.marcacoesDoDia(estado.hoje),
-    dados.acoes(),
-    dados.atas(),
-    dados.minhasPermissoes(estado.uid),
-  ])
-  Object.assign(estado, { perfil, pastas, itens, marcacoes, acoes, atas, permissoes, pronto: true })
+  const [pastas, itens, marcacoes, acoes, atas, listas, listaItens, permissoes] = await Promise.all(
+    [
+      dados.pastas(),
+      dados.itensAtivos(),
+      dados.marcacoesDoDia(estado.hoje),
+      dados.acoes(),
+      dados.atas(),
+      dados.listas(),
+      dados.itensDeListas(),
+      dados.minhasPermissoes(estado.uid),
+    ],
+  )
+  Object.assign(estado, {
+    perfil,
+    pastas,
+    itens,
+    marcacoes,
+    acoes,
+    atas,
+    listas,
+    listaItens,
+    permissoes,
+    pronto: true,
+  })
   avisarMudanca('tudo')
 }
 
