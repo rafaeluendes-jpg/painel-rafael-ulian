@@ -56,7 +56,7 @@ function desenharTela() {
   if (pastaComFoco) $(`[data-pasta="${pastaComFoco}"] .novo-item input`)?.focus()
 }
 
-async function montarPainel(sessao) {
+async function montarPainel() {
   if (montando) return
   montando = true
   try {
@@ -151,7 +151,7 @@ async function iniciar() {
     if (sessao && sessao.user) {
       if (sessaoAtual?.user?.id !== sessao.user.id) {
         sessaoAtual = sessao
-        montarPainel(sessao)
+        montarPainel()
       } else sessaoAtual = sessao
       return
     }
