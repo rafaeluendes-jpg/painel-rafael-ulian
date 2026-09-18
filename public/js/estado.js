@@ -42,8 +42,9 @@ export async function carregarTudo(sessao) {
       dados.marcacoesDoDia(estado.hoje),
       dados.acoes(),
       dados.atas(),
-      dados.listas(),
-      dados.itensDeListas(),
+      // As listas do Checklist não derrubam o painel inteiro se falharem.
+      dados.listas().catch(() => []),
+      dados.itensDeListas().catch(() => []),
       dados.minhasPermissoes(estado.uid),
     ],
   )

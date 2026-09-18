@@ -60,7 +60,26 @@ async function montarPainel(sessao) {
   if (montando) return
   montando = true
   try {
-    await carregarTudo(sessao)
+    // A sessão guardada pode estar com o token vencido (painel aberto horas depois):
+    // pede a sessão atual (o cliente renova sozinha) antes de carregar.
+    const { data } = await sb.auth.getSession()
+    if (!data?.session) {
+      mostrarEntrada()
+      return
+    }
+    try {
+      await carregarTudo(data.session)
+    } catch (e) {
+      if (!/JWT|401|expired|invalid token/i.test(String(e?.message || e?.code))) throw e
+      // Token recusado: renova uma vez; se não der, volta para a entrada.
+      const renovada = await sb.auth.refreshSession()
+      if (!renovada.data?.session) {
+        await sb.auth.signOut()
+        mostrarEntrada()
+        return
+      }
+      await carregarTudo(renovada.data.session)
+    }
     $('#entrada').hidden = true
     $('#app').hidden = false
     if (!/^#(hoje|empresas|lancamento|relatorios|config)/.test(location.hash))
