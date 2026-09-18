@@ -14,7 +14,7 @@ import { montarLancamento } from './tela-lancamento.js'
 const TITULOS = {
   hoje: 'Hoje',
   empresas: 'Empresas',
-  lancamento: 'Lançamento',
+  lancamento: 'Checklist',
   relatorios: 'Relatórios',
   config: 'Configurações',
 }

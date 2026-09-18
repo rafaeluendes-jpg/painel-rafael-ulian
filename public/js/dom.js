@@ -101,6 +101,45 @@ export async function confirmar(pergunta, rotulo = 'Confirmar') {
   return resposta
 }
 
+/** Pede um texto curto num diálogo do painel. Resolve com o texto ou nulo se cancelar. */
+export async function pedirTexto(titulo, { valor = '', placeholder = '', rotulo = 'Salvar' } = {}) {
+  let resposta = null
+  const campo = el('input', {
+    type: 'text',
+    id: 'dialogo-texto',
+    value: valor,
+    placeholder,
+    maxlength: '60',
+    autocomplete: 'off',
+  })
+  const formulario = el(
+    'form',
+    { novalidate: true },
+    el('h2', {}, titulo),
+    el('label', { for: 'dialogo-texto' }, 'Nome'),
+    campo,
+    el(
+      'div',
+      { class: 'dialogo-acoes' },
+      el('button', { type: 'button', class: 'botao', onClick: fecharDialogo }, 'Cancelar'),
+      el('button', { type: 'submit', class: 'botao ouro' }, rotulo),
+    ),
+  )
+  formulario.addEventListener('submit', (evento) => {
+    evento.preventDefault()
+    if (!campo.value.trim()) return
+    resposta = campo.value.trim()
+    fecharDialogo()
+  })
+  const aberto = abrirDialogo(formulario)
+  setTimeout(() => {
+    campo.focus()
+    campo.select()
+  }, 30)
+  await aberto
+  return resposta
+}
+
 /** Mensagem de erro sem detalhe técnico. */
 export function mensagemDeErro(erro, padrao = 'Não deu certo. Tente de novo.') {
   const texto = String(erro?.message || erro || '')

@@ -205,8 +205,10 @@ for (const [nome, largura, altura] of [
     // ---------------- lançamento: nova lista, itens, marcar, zerar
     await page.click('.lateral a[data-tela="lancamento"]')
     await page.waitForSelector('#nova-lista')
-    page.once('dialog', (d) => d.accept('Produto novo'))
     await page.click('#nova-lista')
+    await page.waitForSelector('#dialogo[open] #dialogo-texto')
+    await page.fill('#dialogo-texto', 'Produto novo')
+    await page.click('#dialogo .botao.ouro')
     await page.waitForSelector('.lista .novo-item input')
     for (const texto of ['Ficha técnica', 'Foto do produto', 'Cadastrar no Saipos']) {
       await page.fill('.lista .novo-item input', texto)
@@ -229,7 +231,6 @@ for (const [nome, largura, altura] of [
       (await page.textContent('.lista .fracao')) === '0/3',
       `${nome}: zerar desmarca tudo e mantém os itens`,
     )
-    page.once('dialog', (d) => d.accept())
     await page.click('.lista-rodape .link.perigo')
     await page.waitForSelector('#dialogo[open]')
     await page.click('#dialogo .botao.ouro')
@@ -324,7 +325,10 @@ for (const [nome, largura, altura] of [
   } catch (e) {
     // Foto do momento da falha, para não ficar às cegas.
     await page.screenshot({ path: `${DIR}/${nome}-erro.png`, fullPage: true }).catch(() => {})
-    conferir(false, `${nome}: falhou em ${String(e.message).split('\n').slice(0, 3).join(' | ')}`)
+    conferir(
+      false,
+      `${nome}: falhou em ${String(e.message).split('\n').slice(0, 3).join(' | ')}\n   console: ${consola.join(' | ')}`,
+    )
   }
   conferir(
     consola.length === 0,

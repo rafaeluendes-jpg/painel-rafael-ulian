@@ -1,7 +1,7 @@
 // Lançamento: checklists que o dono monta uma vez (com o nome que quiser), lado a
 // lado como as colunas de Hoje. Marca conforme faz; "Zerar" desmarca tudo para a
 // próxima vez. Não zeram sozinhas e não gravam hora.
-import { el, limpar, icone, avisar, mensagemDeErro, confirmar } from './dom.js'
+import { el, limpar, icone, avisar, mensagemDeErro, confirmar, pedirTexto } from './dom.js'
 import { estado, avisarMudanca } from './estado.js'
 import { dados } from './dados.js'
 import { dataBR, dataDoInstante } from './datas.js'
@@ -59,8 +59,8 @@ function linhaItem(item) {
 }
 
 async function renomear(lista) {
-  const nome = prompt('Nome da lista', lista.nome)
-  if (nome === null || !nome.trim() || nome.trim() === lista.nome) return
+  const nome = await pedirTexto('Renomear lista', { valor: lista.nome, rotulo: 'Renomear' })
+  if (!nome || nome === lista.nome) return
   try {
     Object.assign(lista, await dados.atualizarLista(lista.id, { nome: nome.trim().slice(0, 60) }))
     avisarMudanca('listas')
@@ -201,8 +201,11 @@ function coluna(lista) {
 }
 
 async function novaLista() {
-  const nome = prompt('Nome da nova lista (ex.: Produto novo, Promoção)')
-  if (nome === null || !nome.trim()) return
+  const nome = await pedirTexto('Nova lista', {
+    placeholder: 'Ex.: Produto novo, Promoção',
+    rotulo: 'Criar',
+  })
+  if (!nome) return
   try {
     const lista = await dados.criarLista(
       estado.uid,
@@ -229,8 +232,8 @@ export function montarLancamento(raiz) {
       el(
         'div',
         {},
-        el('h1', {}, 'Checklist de lançamento'),
-        el('p', {}, 'Monte a lista uma vez, marque conforme faz e zere para o próximo.'),
+        el('h1', {}, 'Checklists'),
+        el('p', {}, 'Listas que você monta uma vez, marca conforme faz e zera para usar de novo.'),
       ),
       el(
         'button',
