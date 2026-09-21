@@ -224,6 +224,20 @@ export async function mudarStatusDaAcao(acao, status) {
   avisarMudanca('acoes')
 }
 
+/** Adia (ou adianta) uma ação; o item do checklist ligado a ela acompanha a data. */
+export async function mudarDataDaAcao(acao, comeca) {
+  const nova = await dados.atualizarAcao(acao.id, { comeca })
+  substituirAcao(nova)
+  const item = estado.itens.find((i) => i.acao_id === acao.id)
+  if (item) {
+    const novoItem = await dados.atualizarItem(item.id, { a_partir_de: comeca })
+    const i = estado.itens.findIndex((x) => x.id === item.id)
+    if (i >= 0) estado.itens[i] = novoItem
+  }
+  avisarMudanca('acoes')
+  return nova
+}
+
 export async function anotarAcao(acao, nota) {
   const nova = await dados.atualizarAcao(acao.id, { nota })
   substituirAcao(nova)

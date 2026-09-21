@@ -7,6 +7,7 @@ import {
   podeEditar,
   mudarStatusDaAcao,
   anotarAcao,
+  mudarDataDaAcao,
   recarregarDia,
   souAdmin,
   acaoAtrasada,
@@ -16,6 +17,8 @@ import {
 import { dados } from './dados.js'
 import {
   dataBR,
+  dataCurta,
+  dataDoInstante,
   prazoRelativo,
   diaDaSemana,
   mesIndice,
@@ -118,6 +121,72 @@ function detalhe(acao, pasta) {
   )
 }
 
+/** Mostra a ata como foi colada, para rever tudo (não só as ações). */
+export function verAta(ata) {
+  const pasta = pastaPorId(ata.pasta_id)
+  const quando = `importada em ${dataBR(dataDoInstante(ata.criado_em), true)}`
+  return abrirDialogo([
+    el('h2', {}, ata.titulo),
+    el('p', { class: 'sec' }, [pasta?.nome, ata.origem, quando].filter(Boolean).join(' · ')),
+    ata.texto?.trim()
+      ? el('pre', { class: 'ata-texto' }, ata.texto)
+      : el('p', { class: 'vazio' }, 'Esta ata foi importada sem o texto original.'),
+    el(
+      'div',
+      { class: 'dialogo-acoes' },
+      el('button', { type: 'button', class: 'botao', onClick: fecharDialogo }, 'Fechar'),
+    ),
+  ])
+}
+
+/** Adia ou adianta a data de uma ação. */
+async function mudarData(acao) {
+  const campo = el('input', {
+    type: 'date',
+    id: 'acao-data',
+    value: acao.comeca,
+    required: true,
+    'aria-label': 'Nova data',
+  })
+  const erro = el('p', { class: 'erro', role: 'alert', hidden: true })
+  const formulario = el(
+    'form',
+    { class: 'data-form', novalidate: true },
+    el('h2', {}, 'Mudar a data'),
+    el('p', { class: 'sec' }, '“', acao.titulo, '”'),
+    el('label', { for: 'acao-data' }, 'Nova data'),
+    campo,
+    erro,
+    el(
+      'div',
+      { class: 'dialogo-acoes' },
+      el('button', { type: 'button', class: 'botao', onClick: fecharDialogo }, 'Cancelar'),
+      el('button', { type: 'submit', class: 'botao ouro' }, 'Salvar'),
+    ),
+  )
+  formulario.addEventListener('submit', async (evento) => {
+    evento.preventDefault()
+    const data = campo.value
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(data)) {
+      erro.textContent = 'Informe uma data válida.'
+      erro.hidden = false
+      return
+    }
+    const botao = formulario.querySelector('button[type=submit]')
+    botao.disabled = true
+    try {
+      await mudarDataDaAcao(acao, data)
+      fecharDialogo()
+      avisar(`Data mudada para ${dataCurta(data)}.`)
+    } catch (e) {
+      botao.disabled = false
+      erro.textContent = mensagemDeErro(e, 'Não consegui mudar a data.')
+      erro.hidden = false
+    }
+  })
+  await abrirDialogo(formulario)
+}
+
 export function linhaAcao(acao, pasta, somenteLeitura = false) {
   const atrasada = acaoAtrasada(acao)
   const hoje = acao.comeca === estado.hoje
@@ -196,8 +265,16 @@ export function linhaAcao(acao, pasta, somenteLeitura = false) {
     { class: `acao${acao.status === 'feito' ? ' feita' : ''}`, dataset: { acao: acao.id } },
     caixa,
     el(
-      'div',
-      { class: 'quando num' },
+      pode ? 'button' : 'div',
+      pode
+        ? {
+            type: 'button',
+            class: 'quando num',
+            title: 'Mudar a data',
+            'aria-label': `Mudar a data de ${acao.titulo}`,
+            onClick: () => mudarData(acao),
+          }
+        : { class: 'quando num' },
       el('b', {}, String(diaDoMes(acao.comeca)).padStart(2, '0')),
       `${DIAS_SEMANA[diaDaSemana(acao.comeca)]} · ${MESES[mesIndice(acao.comeca)]}`,
     ),
@@ -400,6 +477,14 @@ function barra(r) {
   return el('div', { class: 'trilho' }, b)
 }
 
+export function botaoVerAta(ata) {
+  return el(
+    'button',
+    { type: 'button', class: 'botao pequeno ver-ata', onClick: () => verAta(ata) },
+    'Ver ata',
+  )
+}
+
 function linhaAta(ata, aberta) {
   const pasta = pastaPorId(ata.pasta_id)
   const acoes = acoesDaAta(ata.id)
@@ -455,11 +540,12 @@ function linhaAta(ata, aberta) {
             el('b', {}, 'Atrasada'),
             ' e sobe para o topo.',
           ),
-          pode
-            ? el(
-                'span',
-                { class: 'ata-botoes' },
-                el(
+          el(
+            'span',
+            { class: 'ata-botoes' },
+            botaoVerAta(ata),
+            pode
+              ? el(
                   'button',
                   {
                     type: 'button',
@@ -469,8 +555,10 @@ function linhaAta(ata, aberta) {
                   r.feitas === r.total
                     ? 'Concluir e mandar para Relatórios'
                     : 'Arquivar em Relatórios',
-                ),
-                el(
+                )
+              : null,
+            pode
+              ? el(
                   'button',
                   {
                     type: 'button',
@@ -480,9 +568,9 @@ function linhaAta(ata, aberta) {
                     onClick: () => apagarAta(ata),
                   },
                   icone(LIXEIRA, 14),
-                ),
-              )
-            : null,
+                )
+              : null,
+          ),
         ),
       )
     : null

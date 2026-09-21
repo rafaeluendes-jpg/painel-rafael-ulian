@@ -3,7 +3,7 @@ import { el, limpar, icone, avisar, mensagemDeErro, confirmar } from './dom.js'
 import { pastaPorId, podeEditar, acoesDaAta, atasArquivadas, recarregarDia } from './estado.js'
 import { dados } from './dados.js'
 import { dataBR, dataDoInstante } from './datas.js'
-import { linhaAcao, resumoDaAta } from './tela-plano.js'
+import { linhaAcao, resumoDaAta, botaoVerAta } from './tela-plano.js'
 
 const SETA = 'M6 3l5 5-5 5'
 const abertas = new Set()
@@ -69,23 +69,27 @@ function linhaAta(ata) {
             { class: 'acoes' },
             acoes.map((a) => linhaAcao(a, pasta, true)),
           ),
-          podeEditar(pasta)
-            ? el(
-                'div',
-                { class: 'plano-rodape' },
-                el('span', {}, 'Arquivada. As rotinas dela não entram mais no checklist do dia.'),
-                el(
-                  'button',
-                  {
-                    type: 'button',
-                    class: 'botao pequeno',
-                    style: { marginLeft: 'auto' },
-                    onClick: () => voltarParaHoje(ata),
-                  },
-                  'Trazer de volta para Hoje',
-                ),
-              )
-            : null,
+          el(
+            'div',
+            { class: 'plano-rodape' },
+            el('span', {}, 'Arquivada. As rotinas dela não entram mais no checklist do dia.'),
+            el(
+              'span',
+              { class: 'ata-botoes' },
+              botaoVerAta(ata),
+              podeEditar(pasta)
+                ? el(
+                    'button',
+                    {
+                      type: 'button',
+                      class: 'botao pequeno',
+                      onClick: () => voltarParaHoje(ata),
+                    },
+                    'Trazer de volta para Hoje',
+                  )
+                : null,
+            ),
+          ),
         )
       : null,
   )
@@ -106,7 +110,7 @@ export function montarRelatorios(raiz = raizRelatorios) {
         'div',
         {},
         el('h1', {}, 'Relatórios'),
-        el('p', {}, 'As atas concluídas, com as ações como ficaram.'),
+        el('p', {}, 'As atas concluídas: o texto original e as ações como ficaram.'),
       ),
     ),
     el(

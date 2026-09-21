@@ -307,11 +307,13 @@ function coluna(pasta) {
     evento.preventDefault()
     const texto = campo.value.trim()
     if (!texto) return
+    // Limpa antes de gravar: a tela é remontada ao gravar e guardaria o texto.
+    campo.value = ''
     campo.disabled = true
     try {
       await adicionarItem(pasta, texto)
-      campo.value = ''
     } catch (e) {
+      campo.value = texto
       avisar(mensagemDeErro(e, 'Não consegui adicionar.'), true)
     } finally {
       campo.disabled = false

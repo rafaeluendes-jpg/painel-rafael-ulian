@@ -68,6 +68,24 @@ remontagem guarda e devolve o texto, o foco e a posição do cursor dos campos
 das colunas do Hoje, das listas do Checklist e das observações do plano.
 Teste no navegador cobre os dois caminhos.
 
+## Data da ação, ata inteira e campo que não zerava (21/09)
+
+**Mudar a data de uma ação.** No plano, o bloco da data (dia + mês) de cada
+ação virou botão "Mudar a data": abre um diálogo com o campo de data e grava
+em `painel_acoes.comeca`. O item do checklist ligado à ação acompanha
+(`painel_itens.a_partir_de`), então uma ação adiada some de Hoje e volta no dia
+novo; "Atrasada" some na hora. `estado.mudarDataDaAcao`, `tela-plano.js`.
+
+**Ata inteira.** A ata já era guardada em `painel_atas.texto` desde a
+importação; faltava mostrar. Botão "Ver ata" no rodapé da ata, na tela Hoje e
+em Relatórios, abre o texto original como foi colado (`verAta` em
+`tela-plano.js`). Atas importadas antes de guardar o texto mostram um aviso.
+
+**Campo "Novo item" não zerava.** Efeito colateral da correção do rascunho:
+a tela era remontada ao gravar e devolvia o texto recém-digitado. Agora o
+campo é limpo antes de gravar (e o texto volta se der erro), no Hoje e no
+Checklist. Testes cobrem os três pontos.
+
 ## Segurança
 
 - RLS ligada em todas as `painel_*`; `anon` sem nenhum privilégio nelas.

@@ -138,13 +138,15 @@ function coluna(lista) {
     evento.preventDefault()
     const texto = campo.value.trim()
     if (!texto) return
+    // Limpa antes de gravar: a tela é remontada ao gravar e guardaria o texto.
+    campo.value = ''
     campo.disabled = true
     try {
       const item = await dados.criarItemDeLista(lista, texto, itens.length + 1)
       estado.listaItens.push(item)
-      campo.value = ''
       avisarMudanca('listas')
     } catch (e) {
+      campo.value = texto
       avisar(mensagemDeErro(e, 'Não consegui adicionar.'), true)
     } finally {
       campo.disabled = false

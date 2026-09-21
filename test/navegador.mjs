@@ -124,6 +124,7 @@ for (const [nome, largura, altura] of [
     await campo.press('Enter')
     await page.waitForSelector('.item:has-text("Comprar açaí")')
     conferir(true, `${nome}: novo item entrou na coluna`)
+    conferir((await campo.inputValue()) === '', `${nome}: campo "Novo item" zera ao adicionar`)
     const linha = page.locator('.item:has-text("Comprar açaí")')
     await linha.hover()
     await linha.locator('.remover').click()
@@ -228,18 +229,51 @@ for (const [nome, largura, altura] of [
       await page.locator('.ata .acao.feita .acao-caixa').uncheck()
       await page.waitForSelector('.ata .acao.feita', { state: 'detached' })
       conferir(true, `${nome}: desmarcar a caixa reabre a ação`)
-      await page.locator('.ata .acao').first().locator('.titulo').click()
+      // mudar a data de uma ação: o prazo muda e o item do checklist acompanha
+      const acaoId = await page.locator('.ata .acao').first().getAttribute('data-acao')
+      const novaData = new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'America/Sao_Paulo',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+      }).format(new Date(Date.now() + 10 * 86400000))
+      await page.locator(`.acao[data-acao="${acaoId}"] .quando`).click()
+      await page.waitForSelector('#dialogo[open] #acao-data')
+      await page.fill('#acao-data', novaData)
+      await page.click('.data-form button[type=submit]')
+      await page.waitForFunction(
+        (id) =>
+          document.querySelector(`.acao[data-acao="${id}"] .prazo`)?.textContent === 'em 10 dias',
+        acaoId,
+      )
+      const acaoMock = mock.tabelas.painel_acoes.find((a) => a.id === acaoId)
+      const itemDaAcao = mock.tabelas.painel_itens.find((i) => i.acao_id === acaoId)
+      conferir(
+        acaoMock.comeca === novaData && itemDaAcao?.a_partir_de === novaData,
+        `${nome}: data da ação mudou (${novaData}) e o item do checklist acompanhou`,
+      )
+      await page.locator(`.acao[data-acao="${acaoId}"] .titulo`).click()
       await page.waitForSelector('.acao-detalhe')
       await foto('plano')
       await page.fill('.acao-detalhe .nota-form input', 'Semana 1: Netão pediu prazo')
       await page.click('.acao-detalhe .nota-form .botao')
       await page.waitForSelector('.acao-detalhe', { state: 'detached' })
       conferir(
-        (await page.locator('.ata .acao .obs').first().textContent()).includes('Netão'),
+        (await page.locator(`.acao[data-acao="${acaoId}"] .obs`).textContent()).includes('Netão'),
         `${nome}: observação salva recolhe o detalhe e fica à vista`,
       )
+      // ver a ata inteira
+      await page.click('#tela-hoje .ver-ata')
+      await page.waitForSelector('#dialogo[open] .ata-texto')
+      conferir(
+        (await page.textContent('#dialogo .ata-texto')).length > 100,
+        `${nome}: "Ver ata" mostra o texto original`,
+      )
+      await foto('ver-ata')
+      await page.click('#dialogo .botao')
+      await page.waitForSelector('#dialogo[open]', { state: 'detached' })
       // arquivar: vai para Relatórios e volta
-      await page.click('.ata-botoes .botao')
+      await page.click('.ata-botoes .botao:not(.ver-ata)')
       await page.waitForSelector('#dialogo[open]')
       await page.click('#dialogo .botao.ouro')
       await page.waitForSelector('.ata', { state: 'detached' })
@@ -256,7 +290,12 @@ for (const [nome, largura, altura] of [
       await page.click('#tela-relatorios .ata-cabecalho')
       await page.waitForSelector('#tela-relatorios .acao')
       await foto('relatorios')
-      await page.click('#tela-relatorios .plano-rodape .botao')
+      await page.click('#tela-relatorios .ver-ata')
+      await page.waitForSelector('#dialogo[open] .ata-texto')
+      conferir(true, `${nome}: ata inteira também abre em Relatórios`)
+      await page.click('#dialogo .botao')
+      await page.waitForSelector('#dialogo[open]', { state: 'detached' })
+      await page.click('#tela-relatorios .plano-rodape .botao:not(.ver-ata)')
       await page.waitForSelector('#dialogo[open]')
       await page.click('#dialogo .botao.ouro')
       await page.waitForSelector('#tela-relatorios .ata', { state: 'detached' })
@@ -282,6 +321,10 @@ for (const [nome, largura, altura] of [
       await page.waitForSelector(`.lista .item:has-text("${texto}")`)
     }
     conferir((await page.locator('.lista .item').count()) === 3, `${nome}: três itens na lista`)
+    conferir(
+      (await page.inputValue('.lista .novo-item input')) === '',
+      `${nome}: campo da lista zera ao dar "+"`,
+    )
     await page.locator('.lista .item input[type=checkbox]').first().check()
     await page.waitForSelector('.lista .item.feito')
     conferir(

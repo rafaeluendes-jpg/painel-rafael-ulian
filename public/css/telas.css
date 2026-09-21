@@ -501,6 +501,36 @@
   line-height: 1.2;
   color: var(--sec);
 }
+.acao button.quando {
+  font: inherit;
+  font-family: var(--mono);
+  text-align: left;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 3px 6px;
+  margin: -3px -6px;
+  cursor: pointer;
+}
+.acao button.quando:hover,
+.acao button.quando:focus-visible {
+  border-color: var(--fio-forte);
+  background: var(--elevado-2);
+}
+.ata-texto {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-family: var(--ui);
+  font-size: 13px;
+  line-height: 1.55;
+  margin: 12px 0 0;
+  padding: 12px 14px;
+  max-height: 60vh;
+  overflow: auto;
+  background: var(--painel);
+  border: 1px solid var(--fio);
+  border-radius: 10px;
+}
 .acao .quando b {
   display: block;
   font-size: 17px;
