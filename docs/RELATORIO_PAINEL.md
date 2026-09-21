@@ -45,6 +45,29 @@ WhatsApp para o servidor Hetzner.
    e gerei os ícones do PWA a partir dele. Trocar depois é substituir o arquivo e
    rodar `node test/icones.mjs`.
 
+## Lembretes por dia (21/09) e o texto que sumia ao digitar
+
+**Lembrete mensal / semanal.** Cada item do Hoje ganhou o botão de calendário
+("Quando lembrar"): todo dia, só nestes dias da semana, ou todo mês num dia
+(1 a 31; dia 31 num mês de 30 vale no último dia). Usa as colunas que já
+existiam em `painel_itens` (`dias_semana`, `dia_mes`), sem migração nova. O
+item que não cai hoje fica na seção recolhível "N lembretes em outros dias" da
+coluna, com a etiqueta ("dia 5", "seg · qua", "seg a sex") e a próxima data.
+Itens que vêm do plano de ação não têm o botão: o ritmo deles é o da ata.
+Arquivos: `datas.js` (`diasNoMes`, `proximoDiaDoItem`, `descricaoAgenda`),
+`dados.js` (`atualizarItem`), `estado.js` (`salvarAgendaDoItem`,
+`itensDaPastaOutrosDias`), `tela-hoje.js`, `telas.css`, `assistente/painel.js`
+(mesma regra do dia 31).
+
+**Texto apagado sozinho.** Causa: a tela é remontada do zero a cada minuto e
+quando a aba volta ao foco (para puxar o que mudou em outro aparelho), e também
+quando qualquer marcação muda; a remontagem descartava o que estava no campo
+"Novo item". Correção em `app.js`: (1) a atualização automática espera enquanto
+um campo de texto está com foco ou um diálogo está aberto; (2) qualquer
+remontagem guarda e devolve o texto, o foco e a posição do cursor dos campos
+das colunas do Hoje, das listas do Checklist e das observações do plano.
+Teste no navegador cobre os dois caminhos.
+
 ## Segurança
 
 - RLS ligada em todas as `painel_*`; `anon` sem nenhum privilégio nelas.

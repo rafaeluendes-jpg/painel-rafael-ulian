@@ -41,11 +41,9 @@ function desenharTela() {
   $('#lateral-nome').textContent = estado.perfil?.nome || estado.email
   $('#barra-data').textContent = dataCurta(estado.hoje)
 
-  // Guarda onde estava o foco (o campo "Novo item" de uma coluna) para devolvê-lo depois.
-  const ativo = document.activeElement
-  const pastaComFoco = ativo?.closest?.('.novo-item')
-    ? ativo.closest('[data-pasta]')?.dataset.pasta
-    : null
+  // A tela é remontada do zero: guarda o que estava sendo digitado (e o foco)
+  // para devolver depois, senão o texto some no meio da frase.
+  const rascunhos = guardarRascunhos()
 
   if (tela === 'hoje') montarHoje($('#tela-hoje'))
   else if (tela === 'empresas') montarEmpresas($('#tela-empresas'), parametro)
@@ -53,7 +51,60 @@ function desenharTela() {
   else if (tela === 'relatorios') montarRelatorios($('#tela-relatorios'))
   else montarConfig($('#tela-config'))
 
-  if (pastaComFoco) $(`[data-pasta="${pastaComFoco}"] .novo-item input`)?.focus()
+  devolverRascunhos(rascunhos)
+}
+
+// Campos de texto que vivem dentro de um bloco identificado (coluna, lista, ação).
+const SELETOR_RASCUNHO =
+  '#conteudo :is([data-pasta], [data-lista], [data-acao]) :is(input[type=text], textarea)'
+const chaveDoCampo = (campo) => {
+  const bloco = campo.closest('[data-pasta], [data-lista], [data-acao]')
+  const id = bloco.dataset.pasta || bloco.dataset.lista || bloco.dataset.acao
+  return `${id}|${campo.closest('form')?.className || ''}|${campo.name || campo.className}`
+}
+
+function guardarRascunhos() {
+  const ativo = document.activeElement
+  const guardados = []
+  for (const campo of document.querySelectorAll(SELETOR_RASCUNHO)) {
+    const comFoco = campo === ativo
+    if (!campo.value && !comFoco) continue
+    guardados.push({
+      chave: chaveDoCampo(campo),
+      valor: campo.value,
+      foco: comFoco,
+      inicio: campo.selectionStart,
+      fim: campo.selectionEnd,
+    })
+  }
+  return guardados
+}
+
+function devolverRascunhos(guardados) {
+  if (!guardados.length) return
+  const campos = [...document.querySelectorAll(SELETOR_RASCUNHO)]
+  for (const g of guardados) {
+    const campo = campos.find((c) => chaveDoCampo(c) === g.chave)
+    if (!campo) continue
+    if (g.valor && !campo.value) campo.value = g.valor
+    if (g.foco) {
+      campo.focus()
+      try {
+        campo.setSelectionRange(g.inicio, g.fim)
+      } catch {
+        /* alguns tipos de campo não aceitam seleção */
+      }
+    }
+  }
+}
+
+/** Alguém está digitando num campo do painel (ou com um diálogo aberto)? */
+function digitando() {
+  if ($('#dialogo')?.open) return true
+  const a = document.activeElement
+  if (!a || !a.closest?.('#conteudo')) return false
+  if (a.tagName === 'TEXTAREA') return true
+  return a.tagName === 'INPUT' && !/^(checkbox|radio|submit|button|range)$/.test(a.type)
 }
 
 async function montarPainel() {
@@ -138,12 +189,13 @@ async function iniciar() {
   })
 
   // Quando a aba volta ao foco (ou a cada minuto), busca o que mudou em outro aparelho.
-  document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible' && estado.pronto) recarregarDia().catch(() => {})
-  })
-  setInterval(() => {
-    if (document.visibilityState === 'visible' && estado.pronto) recarregarDia().catch(() => {})
-  }, 60000)
+  // Nunca no meio de uma digitação: a atualização espera o campo ser solto.
+  const atualizarSeDerTempo = () => {
+    if (document.visibilityState !== 'visible' || !estado.pronto || digitando()) return
+    recarregarDia().catch(() => {})
+  }
+  document.addEventListener('visibilitychange', atualizarSeDerTempo)
+  setInterval(atualizarSeDerTempo, 60000)
   setInterval(virarODia, 30000)
 
   sb.auth.onAuthStateChange((evento, sessao) => {

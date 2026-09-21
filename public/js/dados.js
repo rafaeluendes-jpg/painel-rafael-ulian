@@ -83,6 +83,9 @@ export const dados = {
         .single(),
     )
   },
+  async atualizarItem(id, mudancas) {
+    return ok(await sb.from('painel_itens').update(mudancas).eq('id', id).select().single())
+  },
   async reativarItem(item) {
     return ok(
       await sb

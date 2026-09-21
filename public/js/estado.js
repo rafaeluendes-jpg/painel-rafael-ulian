@@ -107,6 +107,17 @@ export function itensDaPastaHoje(pastaId) {
   return estado.itens.filter((i) => i.pasta_id === pastaId && i.ativo && itemAplica(i, estado.hoje))
 }
 
+/** Itens ativos da pasta que têm agenda (dia do mês, dias da semana) e não caem hoje. */
+export function itensDaPastaOutrosDias(pastaId) {
+  return estado.itens.filter(
+    (i) =>
+      i.pasta_id === pastaId &&
+      i.ativo &&
+      !itemAplica(i, estado.hoje) &&
+      (i.dia_mes || i.dias_semana?.length || (i.a_partir_de && i.a_partir_de > estado.hoje)),
+  )
+}
+
 export function marcacaoDoItem(itemId) {
   return estado.marcacoes.find((m) => m.item_id === itemId && m.feito) || null
 }
@@ -168,6 +179,18 @@ export async function adicionarItem(pasta, texto) {
   estado.itens.push(item)
   avisarMudanca('itens')
   return item
+}
+
+/** Agenda do item: { dias_semana, dia_mes } (nulos = todo dia). */
+export async function salvarAgendaDoItem(item, agenda) {
+  const novo = await dados.atualizarItem(item.id, {
+    dias_semana: agenda.dias_semana?.length ? agenda.dias_semana : null,
+    dia_mes: agenda.dia_mes || null,
+  })
+  const i = estado.itens.findIndex((x) => x.id === item.id)
+  if (i >= 0) estado.itens[i] = novo
+  avisarMudanca('itens')
+  return novo
 }
 
 export async function removerItem(item) {

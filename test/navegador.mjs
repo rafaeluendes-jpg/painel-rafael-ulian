@@ -130,6 +130,72 @@ for (const [nome, largura, altura] of [
     await page.waitForSelector('.item:has-text("Comprar açaí")', { state: 'detached' })
     conferir(true, `${nome}: item removido`)
 
+    // ---------------- o que está sendo digitado não some quando a tela se atualiza
+    await campo.fill('Texto pela metade')
+    // Atualização automática (aba voltou ao foco) enquanto o campo tem foco: espera.
+    await page.evaluate(() => document.dispatchEvent(new Event('visibilitychange')))
+    await page.waitForTimeout(400)
+    conferir(
+      (await campo.inputValue()) === 'Texto pela metade',
+      `${nome}: atualização automática não apaga o que está sendo digitado`,
+    )
+    // Outra ação remonta a tela (marcar item em outra coluna): o rascunho volta.
+    await page.locator('.coluna .item:not(.feito) input[type=checkbox]').first().check()
+    await page.waitForTimeout(400)
+    await page.evaluate(() => document.dispatchEvent(new Event('visibilitychange')))
+    await page.waitForTimeout(400)
+    conferir(
+      (await campo.inputValue()) === 'Texto pela metade',
+      `${nome}: rascunho sobrevive à remontagem da tela`,
+    )
+    await campo.fill('')
+
+    // ---------------- lembrete mensal: some de hoje e aparece em "outros dias"
+    const diaHoje = Number(
+      new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo', day: '2-digit' }).format(
+        new Date(),
+      ),
+    )
+    const diaEscolhido = (diaHoje % 28) + 1
+    const fecharCaixa = page.locator('.item:has-text("Fechar caixa")')
+    await fecharCaixa.hover()
+    await fecharCaixa.locator('.agenda').click()
+    await page.waitForSelector('#dialogo[open] .agenda-form')
+    await page.fill('#agenda-dia-mes', String(diaEscolhido))
+    await page.click('.agenda-form button[type=submit]')
+    await page.waitForSelector('.outros-dias .item:has-text("Fechar caixa")', {
+      state: 'attached',
+    })
+    conferir(
+      (await page
+        .locator('.coluna ul:not(.outros-dias ul) .item:has-text("Fechar caixa")')
+        .count()) === 0,
+      `${nome}: item mensal saiu da lista de hoje`,
+    )
+    const etiquetaMes = await page
+      .locator('.outros-dias .item:has-text("Fechar caixa") .etiqueta')
+      .textContent()
+    conferir(
+      etiquetaMes === `dia ${diaEscolhido}`,
+      `${nome}: etiqueta do lembrete mensal (${etiquetaMes})`,
+    )
+    const itemMock = mock.tabelas.painel_itens.find((i) => i.texto === 'Fechar caixa')
+    conferir(itemMock.dia_mes === diaEscolhido, `${nome}: dia do mês gravado no banco`)
+    await page.click('.outros-dias summary')
+    await foto('hoje-lembrete')
+    // Volta para todo dia: reaparece na lista de hoje.
+    const outro = page.locator('.outros-dias .item:has-text("Fechar caixa")')
+    await outro.hover()
+    await outro.locator('.agenda').click()
+    await page.waitForSelector('#dialogo[open] .agenda-form')
+    await page.check('.agenda-opcao[data-tipo="todo"] input[type=radio]')
+    await page.click('.agenda-form button[type=submit]')
+    await page.waitForSelector('.coluna > ul .item:has-text("Fechar caixa")')
+    conferir(
+      (await page.locator('.outros-dias .item:has-text("Fechar caixa")').count()) === 0,
+      `${nome}: item voltou a ser diário`,
+    )
+
     // ---------------- plano de ação: importar a ata, abrir/fechar, arquivar
     if (nome === 'pc') {
       await page.click('.plano header .botao')

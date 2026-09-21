@@ -254,10 +254,157 @@
   color: var(--erro);
   background: var(--erro-fundo);
 }
+.item .agenda {
+  opacity: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  border: 0;
+  background: transparent;
+  color: var(--terc);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  flex: none;
+}
+.item:hover .agenda,
+.item .agenda:focus-visible {
+  opacity: 1;
+}
+.item .agenda:hover {
+  color: var(--ouro);
+  background: var(--ouro-fundo);
+}
 @media (hover: none) {
-  .item .remover {
+  .item .remover,
+  .item .agenda {
     opacity: 0.6;
   }
+}
+.agenda-etiqueta {
+  color: var(--sec);
+  background: var(--elevado-2);
+}
+
+/* lembretes que não caem hoje (dia do mês, dias da semana) */
+.outros-dias {
+  border-top: 1px dashed var(--fio);
+}
+.outros-dias summary {
+  cursor: pointer;
+  list-style: none;
+  font-size: 12px;
+  color: var(--terc);
+  padding: 8px 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.outros-dias summary::-webkit-details-marker {
+  display: none;
+}
+.outros-dias summary::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(-45deg);
+  transition: transform 0.15s;
+  margin: 0 4px 2px 2px;
+}
+.outros-dias[open] summary::before {
+  transform: rotate(45deg);
+}
+.outros-dias ul {
+  padding: 0 0 6px;
+}
+.item.outro-dia {
+  color: var(--sec);
+}
+.item.outro-dia > svg {
+  flex: none;
+  margin-top: 3px;
+  color: var(--terc);
+}
+
+/* diálogo "Quando lembrar" */
+.agenda-opcoes {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+.agenda-opcao {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--fio);
+  border-radius: 10px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--texto);
+  cursor: pointer;
+}
+.agenda-opcao:has(input[type='radio']:checked) {
+  border-color: var(--ouro);
+  background: var(--ouro-fundo);
+}
+.agenda-opcao input[type='radio'] {
+  accent-color: var(--ouro);
+  margin: 0;
+}
+.agenda-opcao input[type='number'] {
+  width: 72px;
+  padding: 6px 8px;
+  border-radius: var(--raio-p);
+  border: 1px solid var(--fio-forte);
+  background: var(--painel);
+  color: var(--texto);
+  font-family: var(--mono);
+}
+.agenda-dias {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  width: 100%;
+  padding-left: 26px;
+}
+.agenda-dia {
+  position: relative;
+  margin: 0;
+  padding: 5px 10px;
+  border: 1px solid var(--fio-forte);
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--sec);
+  cursor: pointer;
+  user-select: none;
+}
+.agenda-dia input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  cursor: pointer;
+}
+.agenda-dia:has(input:checked) {
+  background: var(--ouro);
+  border-color: var(--ouro);
+  color: var(--ouro-texto);
+}
+.agenda-dia:has(input:focus-visible) {
+  outline: 2px solid var(--ouro);
+  outline-offset: 2px;
+}
+.agenda-nota {
+  font-size: 12px;
+  margin-top: 10px;
 }
 .novo-item {
   border-top: 1px solid var(--fio);

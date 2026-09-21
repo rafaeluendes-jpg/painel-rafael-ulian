@@ -41,7 +41,11 @@ export function itemAplicaNoDia(item, iso, acao) {
   if (iso < inicio) return false
   if (item.desativado_em && iso >= dataDoInstante(item.desativado_em)) return false
   if (item.dias_semana?.length && !item.dias_semana.includes(utc(iso).getUTCDay())) return false
-  if (item.dia_mes && Number(iso.slice(8, 10)) !== item.dia_mes) return false
+  // Dia 31 num mês de 30 vale no último dia do mês (mesma regra do painel).
+  const ultimo = new Date(
+    Date.UTC(Number(iso.slice(0, 4)), Number(iso.slice(5, 7)), 0),
+  ).getUTCDate()
+  if (item.dia_mes && Number(iso.slice(8, 10)) !== Math.min(item.dia_mes, ultimo)) return false
   if (acao && acao.ritmo === 'unica' && acao.status === 'feito' && acao.concluido_em) {
     return iso <= dataDoInstante(acao.concluido_em)
   }

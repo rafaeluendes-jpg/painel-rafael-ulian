@@ -91,6 +91,12 @@ export function mesIndice(iso) {
   return Number(iso.slice(5, 7)) - 1
 }
 
+/** Quantos dias tem o mês da data. */
+export function diasNoMes(iso) {
+  const [a, m] = iso.split('-').map(Number)
+  return new Date(Date.UTC(a, m, 0)).getUTCDate()
+}
+
 /** "quarta-feira, 17 de setembro" */
 export function dataLonga(iso) {
   return fmtLonga.format(utc(iso))
@@ -140,6 +146,26 @@ export function itemAplicaNoDia(item, iso) {
   if (item.dias_semana && item.dias_semana.length && !item.dias_semana.includes(diaDaSemana(iso))) {
     return false
   }
-  if (item.dia_mes && diaDoMes(iso) !== item.dia_mes) return false
+  // Dia 31 num mês de 30: vale o último dia do mês, para o lembrete não sumir.
+  if (item.dia_mes && diaDoMes(iso) !== Math.min(item.dia_mes, diasNoMes(iso))) return false
   return true
+}
+
+/** Próxima data (a partir de amanhã) em que o item entra na lista; nulo se não houver. */
+export function proximoDiaDoItem(item, hoje = hojeISO()) {
+  for (let n = 1; n <= 62; n++) {
+    const dia = somarDias(hoje, n)
+    if (itemAplicaNoDia(item, dia)) return dia
+  }
+  return null
+}
+
+/** "dia 5", "seg · qua", "seg a sex", "fim de semana"; vazio quando é todo dia. */
+export function descricaoAgenda(item) {
+  if (item.dia_mes) return `dia ${item.dia_mes}`
+  const dias = [...(item.dias_semana || [])].sort()
+  if (!dias.length || dias.length === 7) return ''
+  if (dias.join() === '1,2,3,4,5') return 'seg a sex'
+  if (dias.join() === '0,6') return 'fim de semana'
+  return dias.map((d) => DIAS_SEMANA[d]).join(' · ')
 }
