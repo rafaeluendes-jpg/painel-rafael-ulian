@@ -58,6 +58,7 @@ export function montarEntrada() {
 
 export function mostrarEntrada() {
   $('#app').hidden = true
+  $('#carregando').hidden = true
   $('#entrada').hidden = false
   $('#entrar-senha').value = ''
 }

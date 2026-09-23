@@ -26,6 +26,13 @@
     <link rel="stylesheet" href="/css/telas.css" />
   </head>
   <body>
+    <!-- Enquanto a sessão é conferida: some assim que a entrada ou o painel aparece. -->
+    <div id="carregando" class="carregando" role="status" aria-live="polite">
+      <div class="plaquinha"><img src="/logo/ru.svg" alt="" width="28" height="28" /></div>
+      <p class="sec" id="carregando-texto">Abrindo o painel…</p>
+      <button type="button" class="botao" id="carregando-tentar" hidden>Tentar de novo</button>
+    </div>
+
     <!-- Tela de entrada: nada do painel é montado sem sessão válida. -->
     <section id="entrada" class="entrada" hidden>
       <div class="entrada-marca">

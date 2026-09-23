@@ -153,6 +153,8 @@ export function mensagemDeErro(erro, padrao = 'Não deu certo. Tente de novo.') 
     return 'A senha precisa ter pelo menos 8 caracteres.'
   if (/Failed to fetch|NetworkError|Load failed/i.test(texto))
     return 'Sem conexão. Verifique a internet.'
+  if (/tempo_esgotado|Lock.*timeout|timed out/i.test(texto))
+    return 'O painel demorou demais para responder. Verifique a internet e tente de novo.'
   if (/Email not confirmed/i.test(texto)) return 'Confirme o e-mail pelo link que enviamos.'
   return padrao
 }

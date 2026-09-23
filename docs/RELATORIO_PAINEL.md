@@ -86,6 +86,30 @@ a tela era remontada ao gravar e devolvia o texto recém-digitado. Agora o
 campo é limpo antes de gravar (e o texto volta se der erro), no Hoje e no
 Checklist. Testes cobrem os três pontos.
 
+## "Fica carregando e nada" (23/09)
+
+**O que acontecia.** Qualquer falha antes de o painel aparecer (sessão vencida
+que não renovou, trava de sessão entre abas com limite de 5 s, internet parada,
+banco fora) caía no `catch` de `montarPainel`, que só mostrava um aviso de 6 s.
+Depois disso, tela em branco: nem entrada nem painel. Não é possível confirmar
+pelos registros do Supabase qual das causas foi a dele hoje (o acesso aos logs
+foi negado nesta sessão); a correção cobre todas.
+
+**O que mudou (`app.js`, `index.html`, `dom.js`, `telas.css`).**
+
+- Tela de espera "Abrindo o painel…" desde o primeiro instante. Some quando a
+  entrada ou o painel aparece; qualquer erro vira mensagem nela, com o botão
+  "Tentar de novo" (limpa o cache do service worker, desregistra e recarrega).
+  Se em 12 s nada apareceu, a mesma tela avisa que está demorando.
+- Limite de tempo: 8 s para conferir a sessão, 25 s para carregar os dados.
+  Estourou, vira mensagem, não espera infinita.
+- A montagem do painel saiu de dentro do aviso `onAuthStateChange` (adiada com
+  `setTimeout`), como a documentação do supabase-js pede, para nunca disputar a
+  trava interna da biblioteca ao renovar token.
+
+**Testes novos.** Sessão vencida guardada no navegador renova e abre o painel;
+banco fora do ar na abertura mostra o problema e "Tentar de novo" reabre.
+
 ## Segurança
 
 - RLS ligada em todas as `painel_*`; `anon` sem nenhum privilégio nelas.

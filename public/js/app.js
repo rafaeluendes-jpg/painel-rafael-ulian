@@ -107,19 +107,37 @@ function digitando() {
   return a.tagName === 'INPUT' && !/^(checkbox|radio|submit|button|range)$/.test(a.type)
 }
 
+/** Rejeita se a promessa demorar mais que `ms` (internet parada não pode travar o painel). */
+function comTempo(promessa, ms) {
+  let temporizador
+  const limite = new Promise((_, rejeitar) => {
+    temporizador = setTimeout(() => rejeitar(new Error('tempo_esgotado')), ms)
+  })
+  return Promise.race([promessa, limite]).finally(() => clearTimeout(temporizador))
+}
+
+/** Tela de espera com o problema e o botão "Tentar de novo" (nunca fica em branco). */
+function mostrarProblema(mensagem) {
+  $('#app').hidden = true
+  $('#entrada').hidden = true
+  $('#carregando-texto').textContent = mensagem
+  $('#carregando-tentar').hidden = false
+  $('#carregando').hidden = false
+}
+
 async function montarPainel() {
   if (montando) return
   montando = true
   try {
     // A sessão guardada pode estar com o token vencido (painel aberto horas depois):
     // pede a sessão atual (o cliente renova sozinha) antes de carregar.
-    const { data } = await sb.auth.getSession()
+    const { data } = await comTempo(sb.auth.getSession(), 8000)
     if (!data?.session) {
       mostrarEntrada()
       return
     }
     try {
-      await carregarTudo(data.session)
+      await comTempo(carregarTudo(data.session), 25000)
     } catch (e) {
       if (!/JWT|401|expired|invalid token/i.test(String(e?.message || e?.code))) throw e
       // Token recusado: renova uma vez; se não der, volta para a entrada.
@@ -129,9 +147,10 @@ async function montarPainel() {
         mostrarEntrada()
         return
       }
-      await carregarTudo(renovada.data.session)
+      await comTempo(carregarTudo(renovada.data.session), 25000)
     }
     $('#entrada').hidden = true
+    $('#carregando').hidden = true
     $('#app').hidden = false
     if (!/^#(hoje|empresas|lancamento|relatorios|config)/.test(location.hash))
       history.replaceState(null, '', '#hoje')
@@ -150,11 +169,25 @@ async function montarPainel() {
       erro.textContent = 'Este e-mail não tem acesso ao painel.'
       erro.hidden = false
     } else {
-      avisar(mensagemDeErro(e, 'Não consegui carregar o painel.'), true)
+      mostrarProblema(mensagemDeErro(e, 'Não consegui carregar o painel.'))
     }
   } finally {
     montando = false
   }
+}
+
+/** Recomeça do zero: limpa o que o service worker guardou e recarrega a página. */
+async function recomecar() {
+  $('#carregando-tentar').disabled = true
+  try {
+    if ('caches' in window) for (const chave of await caches.keys()) await caches.delete(chave)
+    if ('serviceWorker' in navigator) {
+      for (const r of await navigator.serviceWorker.getRegistrations()) await r.unregister()
+    }
+  } catch {
+    /* sem cache para limpar */
+  }
+  location.reload()
 }
 
 function registrarServiceWorker() {
@@ -198,12 +231,15 @@ async function iniciar() {
   setInterval(atualizarSeDerTempo, 60000)
   setInterval(virarODia, 30000)
 
+  // Este aviso pode chegar de dentro de uma trava da biblioteca (ao renovar um token
+  // vencido). Chamar a biblioteca de novo aqui dentro trava o painel para sempre, por
+  // isso a montagem é adiada para depois que o aviso termina.
   sb.auth.onAuthStateChange((evento, sessao) => {
     if (evento === 'PASSWORD_RECOVERY') pedirSenha = true
     if (sessao && sessao.user) {
       if (sessaoAtual?.user?.id !== sessao.user.id) {
         sessaoAtual = sessao
-        montarPainel()
+        setTimeout(() => montarPainel(), 0)
       } else sessaoAtual = sessao
       return
     }
@@ -213,6 +249,14 @@ async function iniciar() {
       mostrarEntrada()
     }
   })
+
+  // Se em 12 segundos nem o painel nem a entrada apareceram, oferece recomeçar.
+  setTimeout(() => {
+    if ($('#entrada').hidden && $('#app').hidden) {
+      mostrarProblema('Está demorando mais que o normal. Verifique a internet.')
+    }
+  }, 12000)
+  $('#carregando-tentar').addEventListener('click', recomecar)
 
   registrarServiceWorker()
 }

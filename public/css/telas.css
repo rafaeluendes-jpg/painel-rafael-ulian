@@ -1,6 +1,25 @@
 /* Painel Rafael Ulian — telas: entrada, hoje, plano, eficiência, empresas, configurações. */
 
 /* ---------------------------------------------------------------- entrada */
+.carregando {
+  min-height: 100%;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 12px;
+  text-align: center;
+}
+.carregando p {
+  max-width: 320px;
+  padding: 0 16px;
+}
+.carregando .plaquinha {
+  width: 52px;
+  height: 52px;
+}
+.carregando[hidden] {
+  display: none;
+}
 .entrada {
   min-height: 100%;
   display: grid;

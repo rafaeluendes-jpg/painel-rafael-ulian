@@ -47,14 +47,18 @@ for (const [nome, largura, altura] of [
     }),
   )
   let esperandoErroDeLogin = false
+  let esperandoFalhaDeRede = false
   page.on('console', (m) => {
     if (m.type() !== 'error' && m.type() !== 'warning') return
     if (esperandoErroDeLogin && /status of 400/.test(m.text())) return // senha errada de propósito
+    if (esperandoFalhaDeRede && /ERR_CONNECTION_FAILED/.test(m.text())) return // banco fora de propósito
     consola.push(`${m.type()}: ${m.text()}`)
   })
   page.on('pageerror', (e) => consola.push(`pageerror: ${e.message}`))
   page.on('requestfailed', (r) =>
-    consola.push(`requestfailed: ${r.url()} ${r.failure()?.errorText}`),
+    esperandoFalhaDeRede && /painel_perfis/.test(r.url())
+      ? null
+      : consola.push(`requestfailed: ${r.url()} ${r.failure()?.errorText}`),
   )
   const rolaDeLado = () =>
     page.evaluate(
@@ -420,6 +424,39 @@ for (const [nome, largura, altura] of [
       `${nome}: tema salvo depois de recarregar`,
     )
     await page.click('#botao-tema')
+
+    // ---------------- sessão vencida: abrir o painel horas depois renova o token e entra
+    await page.evaluate(() => {
+      for (const deposito of [localStorage, sessionStorage]) {
+        for (const chave of Object.keys(deposito)) {
+          if (!chave.endsWith('-auth-token')) continue
+          const sessao = JSON.parse(deposito.getItem(chave))
+          sessao.expires_at = Math.floor(Date.now() / 1000) - 600
+          deposito.setItem(chave, JSON.stringify(sessao))
+        }
+      }
+    })
+    await page.reload()
+    await page.waitForSelector('#app:not([hidden])', { timeout: 15000 })
+    await page.waitForSelector('.coluna')
+    conferir(true, `${nome}: sessão vencida renova o token e o painel abre`)
+
+    // ---------------- banco fora do ar ao abrir: mostra o problema e "Tentar de novo"
+    esperandoFalhaDeRede = true
+    await page.route('**/rest/v1/painel_perfis**', (rota) => rota.abort('connectionfailed'))
+    await page.reload()
+    await page.waitForSelector('#carregando-tentar:not([hidden])', { timeout: 15000 })
+    conferir(
+      (await page.textContent('#carregando-texto')).length > 10 &&
+        (await page.locator('#app').isHidden()),
+      `${nome}: sem banco, aparece o problema com "Tentar de novo" (${await page.textContent('#carregando-texto')})`,
+    )
+    await page.unroute('**/rest/v1/painel_perfis**')
+    esperandoFalhaDeRede = false
+    await page.click('#carregando-tentar')
+    await page.waitForSelector('#app:not([hidden])', { timeout: 15000 })
+    await page.waitForSelector('.coluna')
+    conferir(true, `${nome}: "Tentar de novo" reabre o painel`)
 
     // ---------------- sair (no celular o botão fica em Configurações > Minha conta)
     if (await page.locator('#botao-sair').isVisible()) await page.click('#botao-sair')
