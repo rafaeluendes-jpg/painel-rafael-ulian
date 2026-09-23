@@ -110,6 +110,26 @@ foi negado nesta sessão); a correção cobre todas.
 **Testes novos.** Sessão vencida guardada no navegador renova e abre o painel;
 banco fora do ar na abertura mostra o problema e "Tentar de novo" reabre.
 
+## Projeto do Supabase apagado e recriado (23/09)
+
+O Rafael apagou o projeto `rafaellos-gestao`, onde o painel vivia (ele achava que
+o painel estava no Hetzner). Sem backup no plano dele: itens, marcações, ata
+importada, listas e acessos se perderam. Ele criou uma organização Free nova e o
+projeto **Rafael Ulian Projetos** (`kyizebvsqjakwjkgczut`, São Paulo). Nada foi
+criado nos projetos `central-jolo-franqueados` e `Joia Gestão Inteligente`
+(ordem dele).
+
+Feito no projeto novo: migrações 0001 a 0003 (mesmo esquema, prefixo
+`painel_`), convite do dono e o usuário dele em `auth.users` com senha
+provisória (sem gatilho de outro sistema aqui). `config.js` aponta para o
+projeto novo. A ata de 16/09 continua em `public/dados/` e volta com "Importar
+ata".
+
+Pendências no painel do Supabase (só pelo site): em Authentication → URL
+Configuration, Site URL e Redirect URLs com
+`https://painel-rafael-ulian.rafaeluendes.workers.dev/**`, para "Esqueci minha
+senha" e convites funcionarem.
+
 ## Segurança
 
 - RLS ligada em todas as `painel_*`; `anon` sem nenhum privilégio nelas.

@@ -1,7 +1,7 @@
 -- Painel Rafael Ulian — esquema inicial.
--- Vive dentro do projeto Supabase "rafaellos-gestao" (decisão do Rafael, 17/09/2026:
--- sem custo de projeto novo). Por isso tudo aqui tem o prefixo `painel_` e nada
--- toca nas tabelas, gatilhos ou permissões do outro sistema.
+-- Viveu no projeto "rafaellos-gestao" até 22/09/2026 (apagado pelo Rafael; dados perdidos).
+-- Desde 23/09/2026 vive no projeto "Rafael Ulian Projetos" (kyizebvsqjakwjkgczut, plano
+-- Free, só do painel). O prefixo `painel_` ficou.
 -- Toda tabela tem RLS ligada: cada pessoa lê e escreve o que é seu, mais o que
 -- lhe foi liberado em `painel_permissoes`. A chave anon não enxerga nada.
 
