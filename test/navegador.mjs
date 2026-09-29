@@ -38,6 +38,17 @@ for (const [nome, largura, altura] of [
   await ctx.route(/fonts\.(googleapis|gstatic)\.com/, (r) =>
     r.fulfill({ status: 200, contentType: 'text/css', body: '' }),
   )
+  // Site do CRM simulado como um app de página única: todo caminho devolve a página,
+  // menos o ícone do app em /icones/icone-512.png (o painel tem de achá-lo na lista).
+  await ctx.route(/crm\.jologelato\.com\.br/, (r) =>
+    new URL(r.request().url()).pathname === '/icones/icone-512.png'
+      ? r.fulfill({
+          status: 200,
+          contentType: 'image/png',
+          body: readFileSync(new URL('../public/icones/icone-512.png', import.meta.url)),
+        })
+      : r.fulfill({ status: 200, contentType: 'text/html', body: '<!doctype html><p>CRM</p>' }),
+  )
   // Sem internet no teste: o serviço de favicon devolve um PNG local.
   await ctx.route(/www\.google\.com\/s2\/favicons/, (r) =>
     r.fulfill({
@@ -379,6 +390,8 @@ for (const [nome, largura, altura] of [
       (await page.locator('.launchpad .azulejo').first().getAttribute('target')) === '_blank',
       `${nome}: ícone abre em aba nova`,
     )
+    // O ícone do CRM é buscado no site dele, um caminho por vez: espera aparecer.
+    await page.waitForSelector('.azulejo:has-text("CRM Jolô") .azulejo-icone img')
     await page.waitForFunction(() =>
       [...document.querySelectorAll('.azulejo-icone img')].every(
         (i) => i.complete && i.naturalWidth > 0,
@@ -386,7 +399,14 @@ for (const [nome, largura, altura] of [
     )
     conferir(
       (await page.locator('.azulejo-icone img.cheio').count()) === 2,
-      `${nome}: ícones da Central Jolô e do CRM (sorvete) carregados`,
+      `${nome}: ícones da Central Jolô e do CRM carregados`,
+    )
+    await page.waitForSelector('.azulejo:has-text("CRM Jolô") .azulejo-icone img')
+    conferir(
+      (await page
+        .locator('.azulejo:has-text("CRM Jolô") .azulejo-icone img')
+        .getAttribute('src')) === 'https://crm.jologelato.com.br/icones/icone-512.png',
+      `${nome}: ícone do CRM veio do próprio app (não do desenho)`,
     )
     await foto('sistemas')
     await page.click('.voltar')

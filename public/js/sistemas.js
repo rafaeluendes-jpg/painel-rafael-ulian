@@ -1,5 +1,7 @@
 // Os sistemas de cada pasta (Empresas). A pasta do banco liga-se aqui pela `chave`.
 // `imagem`: ícone verdadeiro do aplicativo, guardado em /icones/sistemas/.
+// `iconeProprio`: site nosso; o ícone do app é buscado lá (ver icones.js). O endereço
+//   precisa constar em img-src no src/worker.js.
 // `site`: quando não temos o arquivo, o ícone vem do próprio site (serviço de favicon).
 // `icone`: letras de reserva, usadas só se a imagem não carregar.
 
@@ -24,9 +26,11 @@ export const SISTEMAS = {
       icone: G(['#C9A227', '#2E2408'], 'CJ'),
     },
     {
-      // Abre direto na tela de login do CRM.
+      // Abre direto na tela de login do CRM. O ícone é o do próprio app, buscado no
+      // site pelo navegador; o sorvete desenhado só aparece se o site não responder.
       nome: 'CRM Jolô',
       url: 'https://crm.jologelato.com.br/',
+      iconeProprio: 'https://crm.jologelato.com.br',
       imagem: '/icones/sistemas/crm-jolo.svg',
       icone: G(['#F7C4CF', '#8A3A4A'], 'CRM'),
     },

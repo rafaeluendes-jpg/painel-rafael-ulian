@@ -1,13 +1,8 @@
 // Empresas: primeiro as pastas; dentro, a grade de sistemas tipo Launchpad.
 import { el, limpar, icone } from './dom.js'
 import { estado, pastaPorId } from './estado.js'
-import {
-  sistemasDaPasta,
-  enderecoCurto,
-  enderecoParaAbrir,
-  desenhoDoAzulejo,
-  iconeDoSite,
-} from './sistemas.js'
+import { sistemasDaPasta, enderecoCurto, enderecoParaAbrir, desenhoDoAzulejo } from './sistemas.js'
+import { mostrarIcone } from './icones.js'
 
 const VOLTAR = 'M10 3L5 8l5 5'
 const VOLTAR_INVERTIDO = 'M6 3l5 5-5 5'
@@ -37,17 +32,9 @@ function dobra(cor) {
 
 /** Ícone pequeno de um sistema (imagem verdadeira, favicon ou letras). */
 function miniIcone(sistema) {
-  const origem = sistema.imagem || (sistema.site ? iconeDoSite(sistema.site) : null)
   const caixa = el('span', { class: 'mini' })
   caixa.style.background = `linear-gradient(150deg, ${sistema.icone.cores[0]}, ${sistema.icone.cores[1]})`
-  if (origem) {
-    const img = el('img', { src: origem, alt: '', loading: 'lazy' })
-    img.addEventListener('error', () => {
-      img.remove()
-      caixa.textContent = sistema.icone.letras
-    })
-    caixa.append(img)
-  } else caixa.textContent = sistema.icone.letras
+  mostrarIcone(caixa, sistema, () => (caixa.textContent = sistema.icone.letras))
   return caixa
 }
 
@@ -130,23 +117,8 @@ function azulejo(sistema) {
   const ic = el('div', { class: 'azulejo-icone' })
   ic.style.setProperty('--cor-a', sistema.icone.cores[0])
   ic.style.setProperty('--cor-b', sistema.icone.cores[1])
-  const origem = sistema.imagem || (sistema.site ? iconeDoSite(sistema.site) : null)
-  if (origem) {
-    // Ícone verdadeiro do aplicativo; se não carregar, ficam as letras de reserva.
-    const img = el('img', {
-      src: origem,
-      alt: '',
-      loading: 'lazy',
-      class: sistema.imagem ? 'cheio' : 'favicon',
-    })
-    img.addEventListener('error', () => {
-      img.remove()
-      ic.classList.remove('com-imagem')
-      ic.append(desenhoDoAzulejo(sistema.icone))
-    })
-    ic.classList.add('com-imagem')
-    ic.append(img)
-  } else ic.append(desenhoDoAzulejo(sistema.icone))
+  // Ícone verdadeiro do aplicativo; se nada carregar, ficam as letras de reserva.
+  mostrarIcone(ic, sistema, () => ic.append(desenhoDoAzulejo(sistema.icone)))
   // Selo no canto: diferencia variações do mesmo sistema (ex.: o app de faturamento).
   if (sistema.selo) ic.append(el('span', { class: 'selo-canto num' }, sistema.selo))
   const destino = enderecoParaAbrir(sistema)
