@@ -367,8 +367,13 @@ for (const [nome, largura, altura] of [
     await page.click('.pastas .pasta:has-text("Jolô")')
     await page.waitForSelector('.launchpad .azulejo')
     conferir(
-      (await page.locator('.launchpad .azulejo').count()) === 3,
-      `${nome}: Jolô tem 3 sistemas`,
+      (await page.locator('.launchpad .azulejo').count()) === 4,
+      `${nome}: Jolô tem 4 sistemas`,
+    )
+    conferir(
+      (await page.locator('.launchpad .azulejo:has-text("CRM Jolô")').getAttribute('href')) ===
+        'https://crm.jologelato.com.br/',
+      `${nome}: CRM Jolô abre no login do CRM`,
     )
     conferir(
       (await page.locator('.launchpad .azulejo').first().getAttribute('target')) === '_blank',
@@ -380,8 +385,8 @@ for (const [nome, largura, altura] of [
       ),
     )
     conferir(
-      (await page.locator('.azulejo-icone img.cheio').count()) === 1,
-      `${nome}: ícone verdadeiro da Central Jolô carregado`,
+      (await page.locator('.azulejo-icone img.cheio').count()) === 2,
+      `${nome}: ícones da Central Jolô e do CRM (sorvete) carregados`,
     )
     await foto('sistemas')
     await page.click('.voltar')

@@ -23,6 +23,13 @@ export const SISTEMAS = {
       imagem: '/icones/sistemas/central-jolo.png',
       icone: G(['#C9A227', '#2E2408'], 'CJ'),
     },
+    {
+      // Abre direto na tela de login do CRM.
+      nome: 'CRM Jolô',
+      url: 'https://crm.jologelato.com.br/',
+      imagem: '/icones/sistemas/crm-jolo.svg',
+      icone: G(['#F7C4CF', '#8A3A4A'], 'CRM'),
+    },
   ],
   rafaellos: [
     {
