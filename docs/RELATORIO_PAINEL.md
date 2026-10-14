@@ -130,6 +130,26 @@ Configuration, Site URL e Redirect URLs com
 `https://painel-rafael-ulian.rafaeluendes.workers.dev/**`, para "Esqueci minha
 senha" e convites funcionarem.
 
+## "Digito, dou Enter e dá erro" (14/10)
+
+**Causa (registros do Supabase, 14/10 às 8h51).** Três `POST painel_itens`
+recusados com 401, um `refresh_token` 3 s depois e o quarto POST com 201. A
+chave de acesso da sessão vence a cada hora; com a aba parada (computador
+dormindo, aba em segundo plano) o navegador segura os temporizadores e a
+renovação automática do supabase-js não roda a tempo. O pedido sai com a chave
+vencida, o banco recusa e nada é gravado. O painel só tratava isso ao abrir,
+não ao gravar.
+
+**Correção (`supabase.js`, `dados.js`).** `ok()` passa a guardar o status HTTP
+no erro; `sessaoVencida()` reconhece 401/JWT. Todo método de `dados` é
+envolvido: se o banco recusar por chave vencida, renova a sessão
+(`refreshSession`) e repete o pedido uma vez. Repetir é seguro porque o 401 não
+grava nada.
+
+**Teste.** O simulador ganhou `vencerAcessos()` (vence as chaves de acesso e
+mantém a de renovação). O teste reproduziu o defeito antes da correção (item
+não entrava) e passa depois, no computador e no celular.
+
 ## Segurança
 
 - RLS ligada em todas as `painel_*`; `anon` sem nenhum privilégio nelas.

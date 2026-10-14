@@ -59,7 +59,18 @@ export const sb = window.supabase.createClient(CONFIG.supabaseUrl, CONFIG.supaba
 })
 
 /** Lança o erro da resposta do PostgREST, se houver; devolve os dados. */
-export function ok({ data, error }) {
-  if (error) throw error
+export function ok({ data, error, status }) {
+  if (error) {
+    if (status && !error.status) error.status = status
+    throw error
+  }
   return data
+}
+
+/** O banco recusou porque a chave de acesso da sessão venceu (ou sumiu)? */
+export function sessaoVencida(erro) {
+  return (
+    erro?.status === 401 ||
+    /JWT|jwt expired|PGRST30\d/i.test(`${erro?.code || ''} ${erro?.message || ''}`)
+  )
 }

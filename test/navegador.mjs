@@ -59,10 +59,12 @@ for (const [nome, largura, altura] of [
   )
   let esperandoErroDeLogin = false
   let esperandoFalhaDeRede = false
+  let esperandoSessaoVencida = false
   page.on('console', (m) => {
     if (m.type() !== 'error' && m.type() !== 'warning') return
     if (esperandoErroDeLogin && /status of 400/.test(m.text())) return // senha errada de propósito
     if (esperandoFalhaDeRede && /ERR_CONNECTION_FAILED/.test(m.text())) return // banco fora de propósito
+    if (esperandoSessaoVencida && /status of 401/.test(m.text())) return // chave vencida de propósito
     consola.push(`${m.type()}: ${m.text()}`)
   })
   page.on('pageerror', (e) => consola.push(`pageerror: ${e.message}`))
@@ -145,6 +147,22 @@ for (const [nome, largura, altura] of [
     await linha.locator('.remover').click()
     await page.waitForSelector('.item:has-text("Comprar açaí")', { state: 'detached' })
     conferir(true, `${nome}: item removido`)
+
+    // ---------------- aba parada mais de uma hora: a chave de acesso venceu
+    esperandoSessaoVencida = true
+    mock.vencerAcessos()
+    await campo.fill('Depois de uma hora parado')
+    await campo.press('Enter')
+    await page.waitForSelector('.item:has-text("Depois de uma hora parado")', { timeout: 10000 })
+    conferir(
+      mock.tabelas.painel_itens.some((i) => i.texto === 'Depois de uma hora parado'),
+      `${nome}: com a sessão vencida, o item entra (o painel renova e repete)`,
+    )
+    esperandoSessaoVencida = false
+    const parado = page.locator('.item:has-text("Depois de uma hora parado")')
+    await parado.hover()
+    await parado.locator('.remover').click()
+    await parado.waitFor({ state: 'detached' })
 
     // ---------------- o que está sendo digitado não some quando a tela se atualiza
     await campo.fill('Texto pela metade')

@@ -197,6 +197,7 @@ function corpo(req) {
 }
 
 const sessoes = new Map()
+const acessos = new Set() // chaves de acesso (as de renovação ficam fora)
 function token(uid) {
   const t = randomUUID()
   sessoes.set(t, uid)
@@ -212,8 +213,10 @@ function sessao(uid) {
     user_metadata: {},
     created_at: iso(-40),
   }
+  const acesso = token(uid)
+  acessos.add(acesso)
   return {
-    access_token: token(uid),
+    access_token: acesso,
     token_type: 'bearer',
     expires_in: 3600,
     expires_at: Math.floor(Date.now() / 1000) + 3600,
@@ -296,7 +299,7 @@ export function criarMock() {
     // ---------------- rest
     const m = /^\/rest\/v1\/(\w+)$/.exec(url.pathname)
     if (!m || !tabelas[m[1]]) return responder(404, { message: `não existe: ${url.pathname}` })
-    if (!uid) return responder(401, { message: 'JWT expirado' })
+    if (!uid) return responder(401, { code: 'PGRST303', message: 'JWT expired' })
     const tabela = tabelas[m[1]]
     const nome = m[1]
     const prefer = req.headers.prefer || ''
@@ -370,5 +373,10 @@ export function criarMock() {
     }
     return responder(405, {})
   })
-  return { servidor, tabelas, registros }
+  // Como uma aba parada mais de uma hora: as chaves de acesso vencem, a de renovação vale.
+  const vencerAcessos = () => {
+    for (const t of acessos) sessoes.delete(t)
+    acessos.clear()
+  }
+  return { servidor, tabelas, registros, vencerAcessos }
 }

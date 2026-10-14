@@ -1,6 +1,6 @@
 // Service worker: guarda a casca do painel para abrir rápido e instalado no celular.
 // Dados nunca são guardados aqui (vão sempre ao Supabase).
-const VERSAO = 'ru-2026-09-29-2'
+const VERSAO = 'ru-2026-10-14-1'
 const CASCA = [
   '/',
   '/index.html',

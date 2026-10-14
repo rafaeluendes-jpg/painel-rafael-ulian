@@ -1,6 +1,6 @@
 // Acesso ao banco. Toda consulta passa pela RLS: o cliente só enxerga o que é
 // dele ou o que foi liberado em `permissoes`.
-import { sb, ok } from './supabase.js'
+import { sb, ok, sessaoVencida } from './supabase.js'
 import { hojeISO, somarDias } from './datas.js'
 
 export const dados = {
@@ -229,4 +229,20 @@ export const dados = {
   async atualizarNome(uid, nome) {
     return ok(await sb.from('painel_perfis').update({ nome }).eq('id', uid).select().single())
   },
+}
+
+// A chave de acesso da sessão vence a cada hora. Com a aba parada (computador
+// dormindo, celular no bolso) a renovação automática pode não ter rodado: o banco
+// recusa com 401 e nada é gravado. Aí renova a sessão e repete o pedido uma vez.
+for (const [nome, fn] of Object.entries(dados)) {
+  dados[nome] = async (...args) => {
+    try {
+      return await fn(...args)
+    } catch (e) {
+      if (!sessaoVencida(e)) throw e
+      const { data, error } = await sb.auth.refreshSession()
+      if (error || !data?.session) throw e
+      return await fn(...args)
+    }
+  }
 }
